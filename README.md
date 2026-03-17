@@ -45,6 +45,12 @@ exploratrc
 │
 ├── package.json → dependencias del proyecto
 └── README.md → documentación del proyecto
+
+
+
+
+
+
  
 Pasos a seguir: 
 1.Clonar repo
