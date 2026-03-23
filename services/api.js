@@ -1,4 +1,3 @@
-
 /**
  * Archivo de configuración de la API.
  * Se utiliza Axios para realizar las peticiones al backend.
@@ -7,10 +6,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api"
- 
+  baseURL: "http://192.168.1.11:5000/api",
 
-  //En caso de que no te funcionen la app en el cel y si en la web 
+  //En caso de que no te funcionen la app en el cel y si en la web
   //cambiar la direccion por la de la red de tu lap
 });
 

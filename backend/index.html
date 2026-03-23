@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mapa de Lugares</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+      #map {
+        height: 100vh;
+      }
+
+      /* estilos del menú */
+      #menu {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+      }
+
+      #menu button {
+        display: block;
+        margin: 5px;
+        padding: 10px;
+        border: none;
+        background: #333;
+        color: white;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+
+      #menu button:hover {
+        background: #555;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="menu">
+      <button onclick="cargarLugares('gastronomica')">🍽️ Gastronomía</button>
+      <button onclick="cargarLugares('cultura')">🎭 Cultura</button>
+      <button onclick="cargarLugares('night')">🌙 Night</button>
+      <button onclick="cargarLugares('entretenimiento')">
+        🌳 Entretenimiento
+      </button>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script src="app.js"></script>
+  </body>
+</html>
