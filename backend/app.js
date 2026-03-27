@@ -58,13 +58,13 @@ function limpiarMapa() {
 }
 
 function cargarLugares(categoria) {
-  console.log("Categoría:", categoria); // 🔍 debug
+  console.log("Categoría:", categoria); // debug
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude, longitude } = pos.coords;
 
-      console.log("Ubicación:", latitude, longitude); // 🔍 debug
+      console.log("Ubicación:", latitude, longitude); // debug
 
       map.setView([latitude, longitude], 14);
 
@@ -75,7 +75,7 @@ function cargarLugares(categoria) {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("Datos:", data); // 🔍 IMPORTANTE
+          console.log("Datos:", data); // IMPORTANTE
 
           data.forEach((lugar) => {
             const marker = L.marker([lugar.latitud, lugar.longitud]).addTo(map);
