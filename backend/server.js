@@ -20,6 +20,11 @@ app.use(express.json());
 // rutas existentes
 app.use("/api", userRoutes);
 
+//importacion y uso de rutas de mapas
+const mapRoutes = require("./routes/mapRoutes");
+//app.use("/api/maps", mapRoutes);
+console.log("mapRoutes:", mapRoutes);
+
 // 🔹 ruta raíz
 app.get("/", (req, res) => {
   res.send("API funcionando");

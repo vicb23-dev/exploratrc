@@ -1,4 +1,7 @@
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Button, Text, View } from "react-native";
+
+<Button title="Abrir mapa" onPress={() => router.push("/map")} />;
 
 export default function Home() {
   return (
