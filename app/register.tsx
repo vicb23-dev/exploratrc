@@ -16,7 +16,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import API from "../services/api";
 
@@ -47,7 +47,7 @@ export default function Register() {
       // peticion al end point
       const res = await API.post("/register", { nombre, email, password });
       alert("Usuario registrado");
-      router.replace("/home");
+      router.replace("/(tabs)"); // redirige a Home
     } catch (err) {
       setError("Error al registrar");
     } finally {
@@ -58,8 +58,8 @@ export default function Register() {
   return (
     <View style={styles.container}>
       {}
-      <Image 
-        source={require("../assets/images/logo.png")} 
+      <Image
+        source={require("../assets/images/logo.png")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -93,7 +93,11 @@ export default function Register() {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRegister}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -101,7 +105,10 @@ export default function Register() {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/login")}>
+      <TouchableOpacity
+        style={styles.linkButton}
+        onPress={() => router.push("/login")}
+      >
         <Text style={styles.linkText}>¿Ya tienes cuenta? Inicia Sesión</Text>
       </TouchableOpacity>
     </View>

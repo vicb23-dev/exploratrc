@@ -20,9 +20,14 @@ app.use(express.json());
 // rutas existentes
 app.use("/api", userRoutes);
 
+//importacion y uso de rutas de mapas
+const mapRoutes = require("./routes/mapRoutes");
+//app.use("/api/maps", mapRoutes);
+console.log("mapRoutes:", mapRoutes);
+
 // 🔹 ruta raíz
 app.get("/", (req, res) => {
-  res.send("API funcionando 🚀");
+  res.send("API funcionando");
 });
 
 const categorias = {
@@ -45,19 +50,19 @@ async function obtenerImagen(nombreLugar) {
   }
 }
 
-// 🔹 endpoint OpenStreetMap
+//  endpoint OpenStreetMap
 app.get("/lugares", async (req, res) => {
   const { categoria, lat, lng } = req.query;
 
   try {
-    // 🔹 Validar categoría
+    //  Validar categoría
     const filtro = categorias[categoria];
 
     if (!filtro) {
       return res.status(400).json({ error: "Categoría inválida" });
     }
 
-    // 🔹 Query dinámica
+    //  Query dinámica
     const query = `
       [out:json];
       node${filtro}(around:5000,${lat},${lng});
@@ -70,7 +75,7 @@ app.get("/lugares", async (req, res) => {
       { headers: { "Content-Type": "text/plain" } },
     );
 
-    // 🔹 Limpiar datos
+    //  Limpiar datos
     const lugares = await Promise.all(
       response.data.elements.map(async (l) => {
         const nombre = l.tags?.name || "Sin nombre";
