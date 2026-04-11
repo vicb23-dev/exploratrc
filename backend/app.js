@@ -1,3 +1,26 @@
+//Funcion para la distancia
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+const R = 6371; // radio de la tierra en km
+
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // distancia en km
+}
+
+//funcion para calcular el tiempo
+function calcularTiempo(distancia, velocidad) {
+  return (distancia / velocidad) * 60; // minutos
+}
+
 // 1. Crear mapa (posición inicial temporal)
 const map = L.map("map").setView([25.54, -103.44], 13);
 
@@ -75,14 +98,38 @@ function cargarLugares(categoria) {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("Datos:", data); // 🔍 IMPORTANTE
+           console.log("Datos:", data); //IMPORTANTE
 
-          data.forEach((lugar) => {
+           data.forEach((lugar) => {
+            console.log("USER:", latitude, longitude);
+            console.log("LUGAR:", lugar.latitud, lugar.longitud);
+
+
+            const distancia = calcularDistancia(
+            latitude,
+            longitude,
+            lugar.latitud,
+            lugar.longitud    
+            );
+            
+            const tiempoCaminando = calcularTiempo(distancia, 5);   // km/h
+            const tiempoCarro = calcularTiempo(distancia, 40);     // km/h
+            
+            console.log("CAMINANDO:", tiempoCaminando);
+            console.log("CARRO:", tiempoCarro);
+            console.log("DISTANCIA:", distancia);
+            
             const marker = L.marker([lugar.latitud, lugar.longitud]).addTo(map);
 
-            marker.bindPopup(`
-            <h3>${lugar.nombre}</h3>
-            <img src="${lugar.imagen}" width="150"/>
+          marker.bindPopup(`
+          <h3>${lugar.nombre}</h3>
+          <img src="${lugar.imagen}" width="150"/>
+          <br/>
+          Distancia: ${distancia.toFixed(2)} km
+          <br/>
+          Caminando: ${tiempoCaminando.toFixed(1)} min
+          <br/>
+          En carro: ${tiempoCarro.toFixed(1)} min
           `);
 
             markers.push(marker);
