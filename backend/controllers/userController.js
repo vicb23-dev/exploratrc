@@ -37,9 +37,13 @@ const register = async (req, res) => {
       usuario: result.rows[0],
     });
   } catch (error) {
-    console.error("Error en registro:", error.message);
+    console.error("Error completo en registro:", error);
+    console.error("Mensaje:", error.message);
+    console.error("Código PostgreSQL:", error.code);
+
     res.status(500).json({
-      error: "Error al registrar usuario",
+      error: error.message,
+      code: error.code,
     });
   }
 };

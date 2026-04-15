@@ -22,7 +22,7 @@ app.use("/api", userRoutes);
 
 //importacion y uso de rutas de mapas
 const mapRoutes = require("./routes/mapRoutes");
-//app.use("/api/maps", mapRoutes);
+app.use("/api/maps", mapRoutes);
 console.log("mapRoutes:", mapRoutes);
 
 // 🔹 ruta raíz

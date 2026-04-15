@@ -23,7 +23,7 @@ type Props = {
 };
 
 const MapWebView = forwardRef<MapWebViewRef, Props>(
-  ({ initialLat = 25.6866, initialLng = -100.3161, onMapClick }, ref) => {
+  ({ initialLat = 25.5428, initialLng = -103.4068, onMapClick }, ref) => {
     const webviewRef = useRef<WebView>(null);
     const html = useMemo(
       () => getLeafletHtml(initialLat, initialLng, 13),
