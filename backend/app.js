@@ -33,7 +33,7 @@ navigator.geolocation.getCurrentPosition((pos) => {
 
   // usar ubicación real en la API
   fetch(
-    `http://localhost:5000/lugares?categoria=gastronomica&lat=${latitude}&lng=${longitude}`,
+    `http://localhost:5000/map/nearby?type=restaurant&lat=${latitude}&lon=${longitude}`,
   )
     .then((res) => res.json())
     .then((data) => {
@@ -71,7 +71,7 @@ function cargarLugares(categoria) {
       limpiarMapa();
 
       fetch(
-        `http://localhost:5000/lugares?categoria=${categoria}&lat=${latitude}&lng=${longitude}`,
+        `http://localhost:5000/map/nearby?type=${categoria}&lat=${latitude}&lon=${longitude}`,
       )
         .then((res) => res.json())
         .then((data) => {
@@ -100,17 +100,20 @@ function cargarLugares(categoria) {
       const longitude = -103.44;
 
       fetch(
-        `http://localhost:5000/lugares?categoria=${categoria}&lat=${latitude}&lng=${longitude}`,
+        `http://localhost:5000/map/nearby?type=${categoria}&lat=${latitude}&lon=${longitude}`,
       )
         .then((res) => res.json())
         .then((data) => {
-          data.forEach((lugar) => {
-            const marker = L.marker([lugar.latitud, lugar.longitud]).addTo(map);
+          data.elements.forEach((lugar) => {
+            const lat = lugar.lat || lugar.center?.lat;
+            const lon = lugar.lon || lugar.center?.lon;
+            const nombre = lugar.tags?.name || "Lugar sin nombre";
+
+            const marker = L.marker([lat, lon]).addTo(map);
 
             marker.bindPopup(`
-            <h3>${lugar.nombre}</h3>
-            <img src="${lugar.imagen}" width="150"/>
-          `);
+        <h3>${nombre}</h3>
+        `);
 
             markers.push(marker);
           });

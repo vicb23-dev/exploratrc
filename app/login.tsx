@@ -57,7 +57,7 @@ export default function Login() {
       // token local
       await AsyncStorage.setItem("token", token);
       //redirigir al home
-      router.replace("/home");
+      router.replace("/map");
     } catch (err) {
       setError("Credenciales incorrectas");
     } finally {
