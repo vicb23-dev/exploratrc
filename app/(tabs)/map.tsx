@@ -10,8 +10,8 @@ import {
   View,
 } from "react-native";
 
-import MapWebView, { MapWebViewRef } from "../components/MapWebView";
-import { getNearby, reversePlace, searchPlace } from "../services/api";
+import MapWebView, { MapWebViewRef } from "../../components/MapWebView";
+import { getNearby, reversePlace, searchPlace } from "../../services/api";
 
 export default function MapScreen() {
   const [query, setQuery] = useState("");

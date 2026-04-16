@@ -56,8 +56,8 @@ export default function Login() {
       const token = res.data.token;
       // token local
       await AsyncStorage.setItem("token", token);
-      //redirigir al home
-      router.replace("/home");
+      //redirigir al map
+      router.replace("/map"); //  /map
     } catch (err: any) {
       console.log("ERROR LOGIN COMPLETO:", err);
       console.log("RESPUESTA LOGIN BACKEND:", err.response?.data);

@@ -45,6 +45,23 @@ export default function TabLayout() {
         }}
       />
 
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Mapa",
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require("../../assets/images/iconos/iconRuta.png")}
+              style={{
+                width: 30,
+                height: 30,
+                tintColor: focused ? "#02A0C6" : "#000",
+              }}
+              resizeMode="contain"
+            />
+          ),
+        }}
+      />
       {/* <Tabs.Screen
         name="explore"
         options={{
