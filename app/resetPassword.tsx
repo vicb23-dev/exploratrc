@@ -4,7 +4,7 @@
  * Permite al usuario establecer una nueva contraseña
  * después de haber verificado su correo en la pantalla
  * de recuperación de contraseña.
- * 
+ *
  * Funcionalidades:
  * - Captura email del usuario
  * - Captura nueva contraseña
@@ -21,7 +21,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import API from "../services/api";
 
@@ -31,14 +31,13 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-   /**
+  /**
    * Función que maneja la actualización de la contraseña
    * - Valida que los campos no estén vacíos
    * - Envía la petición al backend
    * - Redirige al login si el cambio fue exitoso
    */
   const handleReset = async () => {
-
     //validar campos
     if (!email || !password) {
       setError("Por favor llena todos los campos");
@@ -49,8 +48,6 @@ export default function ResetPassword() {
     setError("");
 
     try {
-
-
       // Petición al endpoint del backend
       await API.post("/reset-password", { email, password });
       alert("Contraseña actualizada");
@@ -95,7 +92,11 @@ export default function ResetPassword() {
         underlineColorAndroid="transparent"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleReset} disabled={loading}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleReset}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -103,7 +104,10 @@ export default function ResetPassword() {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/login")}>
+      <TouchableOpacity
+        style={styles.linkButton}
+        onPress={() => router.push("/login")}
+      >
         <Text style={styles.linkText}>Volver al inicio de sesión</Text>
       </TouchableOpacity>
     </View>

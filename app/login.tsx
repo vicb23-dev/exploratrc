@@ -57,12 +57,19 @@ export default function Login() {
       // token local
       await AsyncStorage.setItem("token", token);
       //redirigir al home
-      router.replace("/map");
-    } catch (err) {
-      setError("Credenciales incorrectas");
+      router.replace("/home");
+    } catch (err: any) {
+      console.log("ERROR LOGIN COMPLETO:", err);
+      console.log("RESPUESTA LOGIN BACKEND:", err.response?.data);
+      setError(err.response?.data?.error || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
+    /*catch (err) {
+      setError("Credenciales incorrectas");
+    } finally {
+      setLoading(false);
+    }*/
   };
 
   return (
