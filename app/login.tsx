@@ -57,7 +57,7 @@ export default function Login() {
       // token local
       await AsyncStorage.setItem("token", token);
       //redirigir al map
-      router.replace("/map"); //  /map
+      router.replace("/mapa"); //  /map
     } catch (err: any) {
       console.log("ERROR LOGIN COMPLETO:", err);
       console.log("RESPUESTA LOGIN BACKEND:", err.response?.data);

@@ -1,9 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Image } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
@@ -12,65 +11,68 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarActiveTintColor: "#02A0C6",
+        tabBarInactiveTintColor: "#000",
       }}
     >
-      {/* <Tabs.Screen
-        name="index"
+      
+      {/*  MAPA */}
+      <Tabs.Screen
+        name="mapa"
         options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          title: "Mapa",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="map" size={size} color={color} />
           ),
         }}
-      />*/}
+      />
 
+     {/* BUSCAR */}
+      <Tabs.Screen
+        name="buscar"
+        options={{
+          title: "Buscar",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
+
+      {/*  HOME */}
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+
+
+      {/*  UBICACIÓN */}
       <Tabs.Screen
         name="rutas"
         options={{
           title: "Rutas",
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require("../../assets/images/iconos/iconRuta.png")}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? "#02A0C6" : "#000",
-              }}
-              resizeMode="contain"
-            />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="location" size={size} color={color} />
           ),
         }}
       />
 
+     {/* FAVORITOS */}
       <Tabs.Screen
-        name="map"
+        name="favoritos"
         options={{
-          title: "Mapa",
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require("../../assets/images/iconos/iconRuta.png")}
-              style={{
-                width: 30,
-                height: 30,
-                tintColor: focused ? "#02A0C6" : "#000",
-              }}
-              resizeMode="contain"
-            />
+          title: "Favoritos",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="heart" size={size} color={color} />
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
-        }}
-      />*/}
     </Tabs>
   );
 }

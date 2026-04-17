@@ -206,6 +206,66 @@ INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta) VALUES
 ((SELECT lug_id FROM lugares WHERE lug_nombre = 'Jardin de Cerveza (TSM)'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Entretenimiento'), 3),
 ((SELECT lug_id FROM lugares WHERE lug_nombre = 'Paseo Milex'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Entretenimiento'), 4);
 
+
+--IMAGENES 
+UPDATE lugares SET imagen_principal_url = 'https://www.torreon.gob.mx/turismo/img/qr/04%20Museo%20Arocena.jpg'
+WHERE lug_nombre = 'Museo Arocena';
+
+UPDATE lugares SET imagen_principal_url = 'https://lh3.googleusercontent.com/gps-cs-s/APNQkAGXcvEBpRQcuYNyklmIRSNGNhDcYQQCg64G1tXmkFzTR1ebrkj70w0YEl0EZki7DB5Nid0TejRXTctMKXqRyu4J0aTevR8JNdN3HeAY-Y-ZkyFQHMDGv01gODlUkza4wMNbmHhFzg=s1360-w1360-h1020-rw'
+WHERE lug_nombre = 'Teatro Isauro Martínez';
+
+UPDATE lugares SET imagen_principal_url = 'https://sic.cultura.gob.mx/imagenes_cache/museo_1362_i_61382.png'
+WHERE lug_nombre = 'Museo del Ferrocarril';
+
+UPDATE lugares SET imagen_principal_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu0wOQ6k98BnzD4DtWexmMKbHRHnfSbjU9SQ&s'
+WHERE lug_nombre = 'Cristo de las Noas';
+
+UPDATE lugares SET imagen_principal_url = 'https://cdn.milenio.com/uploads/media/2017/09/29/mercado-juarez-torreon-cumplio-anos.jpg'
+WHERE lug_nombre = 'Mercado Juárez';
+
+UPDATE lugares SET imagen_principal_url = 'https://tecolotito.elsiglodetorreon.com.mx/i/2015/10/764144.jpeg'
+WHERE lug_nombre = 'Distrito Colón';
+
+UPDATE lugares SET imagen_principal_url = 'https://panchito-kardashian.tar.mx/media/2017/04/paseo_morelos_torreon.jpg'
+WHERE lug_nombre = 'La Morelos';
+
+UPDATE lugares SET imagen_principal_url = 'https://www.noticierosgrem.com.mx/wp-content/uploads/2017/12/TELEFERICO-GONDOLAS.jpeg'
+WHERE lug_nombre = 'Teleférico Torreón';
+
+UPDATE lugares SET imagen_principal_url = 'https://tecolotito.elsiglodetorreon.com.mx/i/2021/09/1481728.jpeg'
+WHERE lug_nombre = 'Bosque Venustiano Carranza';
+
+UPDATE lugares SET imagen_principal_url = 'https://www.aquilaguna.com/wp-content/uploads/2025/12/003-TELEFERICO-DE-TORREON-Y-PUERTO-NOAS-PROYECTAN-UNA-GRAN-AFLUENCIA-PARA-CERRAR-EL-2025-.jpeg'
+WHERE lug_nombre = 'Puerto Noas';
+
+UPDATE lugares SET imagen_principal_url = 'https://miqueridotorreon.com/wp-content/uploads/2024/08/IMG_1538-1296x700.jpeg'
+WHERE lug_nombre = 'Plaza Mayor';
+
+UPDATE lugares SET imagen_principal_url = 'https://mxc.com.mx/wp-content/uploads/2021/12/64641084_451255405700898_6984284235478983489_n-1.jpg'
+WHERE lug_nombre = 'Paseo del Canal de la Perla';
+
+UPDATE lugares SET imagen_principal_url = 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/de/3e/4a/alameda-zaragoza.jpg'
+WHERE lug_nombre = 'Alameda Zaragoza';
+
+UPDATE lugares SET imagen_principal_url = 'https://www.hksinc.com/wp-content/uploads/2018/10/estadio_tsm_corona_B-1.jpg'
+WHERE lug_nombre = 'Estadio Corona (TSM)';
+
+UPDATE lugares SET imagen_principal_url = 'https://cdn2.telediario.mx/uploads/media/2019/09/28/cuatro_caminos.jpg'
+WHERE lug_nombre = 'Plaza Cuatro Caminos';
+
+UPDATE lugares SET imagen_principal_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWlmsacYcfcGdfFej3jc00nx6E6033qMFrYg&s'
+WHERE lug_nombre = 'Planetarium Torreón';
+
+UPDATE lugares SET imagen_principal_url = 'https://tecolotito.elsiglodetorreon.com.mx/i/2019/09/1221122.jpeg'
+WHERE lug_nombre = 'Cinemex Platino Cuatro Caminos';
+
+UPDATE lugares SET imagen_principal_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScXmrGP8wuM9DK_gZy68BwWJBHFBErdoSrHQ&s'
+WHERE lug_nombre = 'Jardin de Cerveza (TSM)';
+
+UPDATE lugares SET imagen_principal_url = 'https://paseomilex.com/wp-content/uploads/2021/02/rsz_1img_3395.jpg'
+WHERE lug_nombre = 'Paseo Milex';
+
+
 Instrucciones de ejecucion de la rama:
 
 1.Asegúrate de tener instalada la librería para conectar Node con PostgreSQL (Si no, escribe esto en la terminal de la raiz del proyecto):

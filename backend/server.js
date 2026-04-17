@@ -15,12 +15,16 @@ const pool = new Pool({
   user: "postgres",          // Tu usuario de pgAdmin
   host: "localhost",
   database: "exploratrc",    // El nombre de tu base de datos
-  password: "1234",   // Tu contraseña de pgAdmin
+  password: "1234",          // Tu contraseña de pgAdmin
   port: 5432,
 });
 
 // importar rutas de usuarios
 const userRoutes = require("./routes/userRoutes");
+
+// 🔥 🔹 NUEVO: importar rutas de rutas (gastronomica, cultura, etc.)
+const rutasRoutes = require("./routes/rutas");
+const detalleLugarRoutes = require("./routes/detallesLugarRuta");
 
 const app = express();
 
@@ -35,6 +39,11 @@ app.use(express.json());
 // rutas existentes
 app.use("/api", userRoutes);
 
+// 🔥 🔹 NUEVO: usar rutas de rutas
+app.use("/api", rutasRoutes);
+app.use("/api", detalleLugarRoutes);
+//app.use("/api", detalleLugarRoutes);
+
 //importacion y uso de rutas de mapas
 const mapRoutes = require("./routes/mapRoutes");
 app.use("/api/maps", mapRoutes);
@@ -45,7 +54,7 @@ app.get("/", (req, res) => {
   res.send("API funcionando");
 });
 
-//endpoint
+//endpoint (ESTE LO DEJAMOS TAL CUAL PARA TU MAPA)
 app.get("/lugares", async (req, res) => {
   const { categoria } = req.query; // Recibe 'Cultura', 'Gastronomica', etc.
 
@@ -67,7 +76,6 @@ app.get("/lugares", async (req, res) => {
 
     const result = await pool.query(query, [categoria]);
     
-    // Si no hay resultados, enviamos un array vacío
     res.json(result.rows);
 
   } catch (error) {
