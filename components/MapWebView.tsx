@@ -1,5 +1,6 @@
-//Este componente encapsula el WebView y expone métodos para interactuar con Leaflet.
-//Permite actualizar la ubicación del mapa y agregar marcadores dinámicamente desde React Native.
+// Este componente encapsula el WebView y expone métodos para interactuar con Leaflet.
+// Permite actualizar la ubicación del mapa y agregar marcadores dinámicamente desde React Native.
+
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
@@ -25,14 +26,16 @@ type Props = {
 const MapWebView = forwardRef<MapWebViewRef, Props>(
   ({ initialLat = 25.5428, initialLng = -103.4068, onMapClick }, ref) => {
     const webviewRef = useRef<WebView>(null);
+
     const html = useMemo(
       () => getLeafletHtml(initialLat, initialLng, 13),
-      [initialLat, initialLng],
+      [initialLat, initialLng]
     );
 
     const handleMessage = (event: any) => {
       try {
         const data = JSON.parse(event.nativeEvent.data);
+
         if (data.type === "map_click" && onMapClick) {
           onMapClick({ lat: data.lat, lng: data.lng });
         }
@@ -50,15 +53,16 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
             lng: place.lng,
             title: place.title || "Resultado",
             zoom: 15,
-          }),
+          })
         );
       },
+
       setMultipleMarkers(places: Place[]) {
         webviewRef.current?.postMessage(
           JSON.stringify({
             type: "set_multiple_markers",
             places,
-          }),
+          })
         );
       },
     }));
@@ -76,7 +80,7 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
         />
       </View>
     );
-  },
+  }
 );
 
 export default MapWebView;

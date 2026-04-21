@@ -1,7 +1,8 @@
-//Implementación del frontend para el mapa utilizando Leaflet.js.
-//Este código genera un HTML que se puede cargar en un WebView de React Native para mostrar un mapa interactivo.
-//El mapa se centra inicialmente en Monterrey, México, pero se puede actualizar dinámicamente mediante mensajes
-//enviados desde React Native.
+// Implementación del frontend para el mapa utilizando Leaflet.js.
+// Este código genera un HTML que se puede cargar en un WebView de React Native para mostrar un mapa interactivo.
+// El mapa se centra inicialmente en Torreón, Coahuila, pero se puede actualizar dinámicamente mediante mensajes
+// enviados desde React Native.
+
 export const getLeafletHtml = (lat = 25.5428, lng = -103.4068, zoom = 13) => `
 <!DOCTYPE html>
 <html>
@@ -61,6 +62,7 @@ export const getLeafletHtml = (lat = 25.5428, lng = -103.4068, zoom = 13) => `
         clearMarkers();
 
         const marker = L.marker([data.lat, data.lng]).addTo(map);
+
         if (data.title) {
           marker.bindPopup(data.title);
         }
@@ -74,9 +76,11 @@ export const getLeafletHtml = (lat = 25.5428, lng = -103.4068, zoom = 13) => `
 
         data.places.forEach(place => {
           const marker = L.marker([place.lat, place.lng]).addTo(map);
+
           if (place.title) {
             marker.bindPopup(place.title);
           }
+
           markers.push(marker);
         });
 
