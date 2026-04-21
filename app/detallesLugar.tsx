@@ -2,13 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import API from "../services/api";
 
@@ -124,10 +124,20 @@ export default function DetalleLugar() {
         </View>
 
         <View style={styles.botonesRow}>
-          <TouchableOpacity style={styles.botonRuta}>
-            <Text style={styles.textoBoton}>Ver Ruta</Text>
-          </TouchableOpacity>
-
+         <TouchableOpacity
+  style={styles.botonRuta}
+  onPress={() =>
+    router.push({
+      pathname: "/navegacionRuta",
+      params: {
+        categoria: lugar.categoria || "",
+        id: lugar.lug_id.toString(),
+      },
+    })
+  }
+>
+  <Text style={styles.textoBoton}>Ver Ruta</Text>
+</TouchableOpacity>
           <TouchableOpacity style={styles.botonCalificar}>
             <Text style={styles.textoBoton}>Calificar</Text>
           </TouchableOpacity>
