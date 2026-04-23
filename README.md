@@ -287,3 +287,266 @@ const pool = new Pool({
 -Inicia Expo: npx expo start
 
 
+
+
+
+--Tablas para actividades del sprint 7
+
+--transportes
+CREATE TABLE transportes_publicos (
+    tp_id SERIAL PRIMARY KEY,
+    tp_nombre VARCHAR(100) NOT NULL,
+    tp_tipo VARCHAR(50),
+    tp_color VARCHAR(20),
+    tp_descripcion TEXT
+);
+
+--Relación con lugares turísticos
+CREATE TABLE transportes_lugares (
+    tp_id INT NOT NULL,
+    lug_id INT NOT NULL,
+    PRIMARY KEY (tp_id, lug_id),
+    FOREIGN KEY (tp_id) REFERENCES transportes_publicos(tp_id) ON DELETE CASCADE,
+    FOREIGN KEY (lug_id) REFERENCES lugares(lug_id) ON DELETE CASCADE
+);
+
+
+Se insertan valores que son las rutas mas conocidas de Torreón y que pasan por las rutas que tenemos 
+
+
+INSERT INTO transportes_publicos (tp_nombre, tp_tipo, tp_color, tp_descripcion) VALUES
+('Polvorera', 'Camión urbano', '#A0522D', 'Cubre la colonia Polvorera, baja al centro, pasa por La Moderna y El Arenal.'),
+('Primero de Mayo', 'Camión urbano', '#1E88E5', 'Cubre la colonia Primero de Mayo y colonias cercanas al Cerro de las Noas.'),
+('Metalúrgica', 'Camión urbano', '#6D4C41', 'Pasa por Vicente Guerrero, Metalúrgica y va por bulevar Revolución hacia Mercado Alianza.'),
+('Panteones', 'Camión urbano', '#8E24AA', 'Cubre Vicente Guerrero, Braulio Fernández, Lázaro Cárdenas, Laguna, La Dalia y Ex Hacienda La Perla.'),
+('Sur Jardines', 'Camión urbano', '#43A047', 'Cubre Jardines de California, La Merced, Manhattan, John Deere, Parque Industrial Mieleras y Ex Hacienda La Perla.'),
+('San Joaquín', 'Camión urbano', '#F4511E', 'Pasa por San Joaquín, Presidente Carranza, Villa California, Ciudad Nazas, Sol de Oriente, Rincón La Joya y Santa Fe.'),
+('Dorada', 'Camión urbano', '#FDD835', 'Cubre El Águila, Latinoamericana, Residencial del Norte, Escuela Normal y rumbo al centro.'),
+('Valle Oriente Azul', 'Camión urbano', '#3949AB', 'Cruza Valle Oriente hacia Monte Real y Rincón del Monte.'),
+('Valle Oriente Rojo', 'Camión urbano', '#E53935', 'Va por Revolución, entra a Valle Oriente, Las Flores, Latinoamericana, Cereso, Jardines Universidad y Monte Real.'),
+('La Joya', 'Camión urbano', '#00897B', 'Cubre ejido La Joya, parte de Sol de Oriente y bulevar Revolución hacia el centro.'),
+('Norte', 'Camión urbano', '#5E35B1', 'Cubre Nueva California, Villa California, Ciudad Nazas, Las Aves y termina en La Joya y La Joyita.'),
+('Alianza La Cortina', 'Camión urbano', '#7CB342', 'Cubre La Cortina, Valle Revolución, Valle Verde, La Mina, periférico y Fidel Velázquez hacia el centro.'),
+('Allende-Abastos-La Cortina', 'Camión urbano', '#FB8C00', 'Parte de La Joyita, cubre La Cortina, Valle Verde, San Antonio de los Bravos, Satélite y clínica 66.'),
+('Independencia-Narro', 'Camión urbano', '#00ACC1', 'Recorrido similar a Allende-Abastos-La Cortina, entrando a Magdalenas, Abastos, Independencia y centro.'),
+('Alianza-Satélite', 'Camión urbano', '#C0CA33', 'Va al centro, entra a Satélite y recorre San Agustín, Veredas La Paz y zonas cercanas.'),
+('Jacarandas', 'Camión urbano', '#D81B60', 'Cubre Jacarandas, Alamedas, El Roble, Villa Florida, Nueva Laguna, Ciudad Industrial y Villas San Agustín.'),
+('Independencia-Magdalenas', 'Camión urbano', '#039BE5', 'Entra a Magdalenas, Pancho Villa, Bocanegra y Harinera.'),
+('Triángulo Amarillo', 'Camión urbano', '#F9A825', 'Cubre Jacarandas, El Fresno, Independencia, Nudo Mixteco, El Arenal y La Moderna.'),
+('Triángulo Rojo', 'Camión urbano', '#C62828', 'Cubre Felipe Ángeles, Diagonal Reforma, Nueva California, Abastos, Magdalenas, Escuela Normal, Rosita y La Fuente.'),
+('Conchita Roja', 'Camión urbano', '#AD1457', 'Cubre La Conchita, ejido La Concha, TSM y carretera Torreón-San Pedro hacia el centro.'),
+('Campo Alianza', 'Camión urbano', '#455A64', 'Ruta urbana que conecta Campo Alianza con el centro y varios puntos turísticos.'),
+('Santa Fe', 'Camión urbano', '#2E7D32', 'Ruta urbana que conecta Santa Fe con el centro y zonas turísticas.'),
+('Ciudad Nazas', 'Camión urbano', '#00838F', 'Ruta urbana que conecta Ciudad Nazas con diversos sectores de la ciudad.'),
+('Solima', 'Intermunicipal', '#6A1B9A', 'Ruta intermunicipal que cubre zonas periféricas y conexión con puntos turísticos.'),
+('Matamoros', 'Intermunicipal', '#283593', 'Ruta intermunicipal Torreón-Matamoros.'),
+('Chavez', 'Camión urbano', '#4E342E', 'Ruta urbana que conecta varios sectores hacia el centro.'),
+('Los Laureles', 'Camión urbano', '#558B2F', 'Ruta urbana que cubre Laureles y zonas cercanas.'),
+('Independencia-Aeropuerto', 'Camión urbano', '#0277BD', 'Ruta urbana sobre Independencia hacia zona aeropuerto.'),
+('Independencia-Antonio Narro', 'Camión urbano', '#26A69A', 'Ruta urbana por Independencia y Antonio Narro.'),
+('San Agustín', 'Camión urbano', '#9CCC65', 'Ruta urbana que conecta San Agustín y el centro.'),
+('Teleférico Torreón', 'Teleférico', '#00BCD4', 'Sistema aéreo que conecta el centro con el Cristo de las Noas.');
+
+--asociar lugares con transportes
+
+--RUTA GASTRONOMICA
+
+--Meercado Juarez -
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Mercado Juárez')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Mercado Juárez'))
+ ON CONFLICT DO NOTHING;
+
+--Distrito colon -
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Sur Jardines'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Distrito Colón'))
+ ON CONFLICT DO NOTHING;
+
+--La morelos -
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'La Morelos'))
+ ON CONFLICT DO NOTHING;
+
+--RUTA CULTURAL
+--Museo Arocena ---
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Arocena')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Arocena')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Allende-Abastos-La Cortina'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Arocena'))
+ ON CONFLICT DO NOTHING;
+
+--Teatro Isauro Martinez ---
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Santa Fe'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Teatro Isauro Martínez')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Norte'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Teatro Isauro Martínez'))
+ ON CONFLICT DO NOTHING;
+
+--Museo del Ferrocarril ---
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Ciudad Nazas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'La Joya'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Alianza La Cortina'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Solima'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Matamoros'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Chavez'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Ferrocarril'))
+ ON CONFLICT DO NOTHING;
+
+
+--Paseo del canal de la  Perla ---
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Paseo del Canal de la Perla')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Paseo del Canal de la Perla'))
+ ON CONFLICT DO NOTHING;
+
+--RUTA ENTRETENIMIENTO
+--Planetarium Torreon ---
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Alianza La Cortina'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Antonio Narro'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Aeropuerto'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Metalúrgica'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Los Laureles'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Santa Fe'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Planetarium Torreón'))
+ ON CONFLICT DO NOTHING;
+
+
+
+
+-- Cinemex Plaza cuatro caminos --
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Magdalenas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cinemex Platino Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Valle Oriente Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cinemex Platino Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Solima'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cinemex Platino Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Chavez'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cinemex Platino Cuatro Caminos'))
+ ON CONFLICT DO NOTHING;
+
+
+-- Jardin de cerveza  (TSM) --
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Triángulo Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Jardin de Cerveza (TSM)')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Jardin de Cerveza (TSM)')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Conchita Roja'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Jardin de Cerveza (TSM)'))
+ ON CONFLICT DO NOTHING;
+ 
+
+--Paseo Milex -
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Conchita Roja'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Paseo Milex'))
+ ON CONFLICT DO NOTHING;
+
+--RUTA NIGHT
+--Plaza mayor-
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Santa Fe'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Mayor')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Norte'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Mayor')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'San Agustín'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Mayor'))
+ ON CONFLICT DO NOTHING;
+
+--Alameda Zaragoza -
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+ ((SELECT tp_id FROM transportes_publicos WHERE tp_nombre= 'Allende-Abastos-La Cortina'),
+  (SELECT lug_id FROM lugares WHERE lug_nombre='Alameda Zaragoza')),
+  ((SELECT tp_id FROM transportes_publicos WHERE tp_nombre='Jacarandas'),
+  (SELECT lug_id FROM lugares WHERE lug_nombre= 'Alameda Zaragoza'))
+  ON CONFLICT DO NOTHING;
+
+--Plaza Cuatro caminos
+  INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Magdalenas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Valle Oriente Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Solima'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Cuatro Caminos')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Chavez'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Plaza Cuatro Caminos'))
+ ON CONFLICT DO NOTHING;
+
+ -- Estadio coronona  (TSM) -
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Triángulo Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Estadio Corona (TSM)')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Estadio Corona (TSM)')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Conchita Roja'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Estadio Corona (TSM)'))
+ ON CONFLICT DO NOTHING;
+
+--RUTA FAMILIAR
+--Bosque venustiano Carranza - --
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Triángulo Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Venustiano Carranza')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Venustiano Carranza'))
+ ON CONFLICT DO NOTHING;
+ 
+ --Teleferico torreon
+ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Primero de Mayo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Teleférico Torreón')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Teleférico Torreón'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Teleférico Torreón'))
+ ON CONFLICT DO NOTHING;
+
+ --Cristo de las Noas---
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Primero de Mayo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cristo de las Noas')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Teleférico Torreón'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Cristo de las Noas'))
+ ON CONFLICT DO NOTHING;
+
+ --Puerto Noas
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Primero de Mayo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Puerto Noas')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Teleférico Torreón'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Puerto Noas'))
+ ON CONFLICT DO NOTHING;
+
+
+SELECT 
+  tl.tp_id,
+  t.tp_nombre,
+  tl.lug_id,
+  l.lug_nombre
+FROM transportes_lugares tl
+JOIN transportes_publicos t ON tl.tp_id = t.tp_id
+JOIN lugares l ON tl.lug_id = l.lug_id
+ORDER BY l.lug_nombre, t.tp_nombre;
+ 

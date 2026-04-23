@@ -19,6 +19,10 @@ const pool = new Pool({
   port: 5432,
 });
 
+
+//transportes
+const transporteRoutes = require("./routes/transporteRoutes");
+
 // importar rutas de usuarios
 const userRoutes = require("./routes/userRoutes");
 
@@ -43,6 +47,10 @@ app.use("/api", userRoutes);
 app.use("/api", rutasRoutes);
 app.use("/api", detalleLugarRoutes);
 //app.use("/api", detalleLugarRoutes);
+
+
+// rutas de transporte
+app.use("/api", transporteRoutes);
 
 //importacion y uso de rutas de mapas
 const mapRoutes = require("./routes/mapRoutes");
