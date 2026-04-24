@@ -19,6 +19,10 @@ const pool = new Pool({
   port: 5432,
 });
 
+
+//transportes
+const transporteRoutes = require("./routes/transporteRoutes");
+
 // importar rutas de usuarios
 const userRoutes = require("./routes/userRoutes");
 
@@ -43,6 +47,32 @@ app.use("/api", userRoutes);
 app.use("/api", rutasRoutes);
 app.use("/api", detalleLugarRoutes);
 //app.use("/api", detalleLugarRoutes);
+
+app.get("/api/transportes/lugar/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        t.tp_id,
+        t.tp_nombre,
+        t.tp_tipo,
+        t.tp_color,
+        t.tp_descripcion
+      FROM transportes_lugares tl
+      JOIN transportes_publicos t ON tl.tp_id = t.tp_id
+      WHERE tl.lug_id = $1
+      ORDER BY t.tp_nombre ASC
+    `, [id]);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error test transportes:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+// rutas de transporte
+app.use("/api", transporteRoutes);
 
 //importacion y uso de rutas de mapas
 const mapRoutes = require("./routes/mapRoutes");
@@ -88,3 +118,4 @@ app.get("/lugares", async (req, res) => {
 app.listen(5000, () => {
   console.log("Servidor en http://localhost:5000");
 });
+

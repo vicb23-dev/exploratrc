@@ -1,8 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -10,49 +8,122 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import API from "../services/api";
+import API, { getTransportesPorLugar } from "../services/api";
 
+import * as Location from "expo-location";
 type LugarDetalle = {
   lug_id: number;
   lug_nombre: string;
   lug_descripcion: string;
-  imagen_principal_url: string | null;
-  lug_latitud?: number;
-  lug_longitud?: number;
-  lug_tags?: string | null;
-  categoria?: string;
+  lug_latitud: number;
+  lug_longitud: number;
+  imagen_principal_url: string;
+  lug_tags: string;
+  categoria: string;
 };
 
-export default function DetalleLugar() {
-  const params = useLocalSearchParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+type Transporte = {
+  tp_id: number;
+  tp_nombre: string;
+  tp_tipo: string;
+  tp_color: string;
+  tp_descripcion: string;
+};
+
+function calcularDistancia(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function calcularTiempo(distancia: number, velocidad: number) {
+  return (distancia / velocidad) * 60;
+}
+
+export default function detallesLugar() {
+  const { id } = useLocalSearchParams();
+  const router = useRouter();
 
   const [lugar, setLugar] = useState<LugarDetalle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [transportes, setTransportes] = useState<Transporte[]>([]);
+
+
+  const obtenerUbicacionUsuario = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== "granted") {
+      console.log("Permiso de ubicación denegado");
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({});
+
+    setUserLocation({
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
+    });
+  } catch (error) {
+    console.log("Error obteniendo ubicación:", error);
+  }
+};
+  const [userLocation, setUserLocation] = useState<{
+  lat: number;
+  lng: number;
+} | null>(null);
+  // Ubicación base simulada. Después puedes cambiarla por GPS real.
+  const userLat = 25.5422;
+  const userLng = -103.4578;
 
   useEffect(() => {
-    if (id) {
-      obtenerDetalleLugar();
-    } else {
-      setLoading(false);
-    }
-  }, [id]);
+  obtenerUbicacionUsuario();
+
+  if (id) {
+    obtenerDetalleLugar();
+    obtenerTransportes();
+  }
+}, [id]);
 
   const obtenerDetalleLugar = async () => {
     try {
       const res = await API.get(`/lugares/${id}`);
       setLugar(res.data);
     } catch (error) {
-      console.log("Error al obtener detalle:", error);
+      console.log("Error al obtener lugar:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const obtenerTransportes = async () => {
+    try {
+      const data = await getTransportesPorLugar(id);
+      setTransportes(data);
+    } catch (error) {
+      console.log("Error transportes:", error);
     }
   };
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#7B2CBF" />
+        <Text>Cargando...</Text>
       </View>
     );
   }
@@ -60,86 +131,111 @@ export default function DetalleLugar() {
   if (!lugar) {
     return (
       <View style={styles.center}>
-        <Text>No se encontró el lugar.</Text>
+        <Text>No se encontró el lugar</Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={28} color="#000" />
-      </TouchableOpacity>
-
-      {/* LOGO CENTRADO */}
-      <View style={styles.logoContainer}>
-        <Image
-          source={require("../assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
       <Image
-        source={{
-          uri: lugar.imagen_principal_url || "https://via.placeholder.com/300",
-        }}
-        style={styles.imagenPrincipal}
+        source={{ uri: lugar.imagen_principal_url }}
+        style={styles.image}
       />
 
       <View style={styles.content}>
-        <View style={styles.tituloRow}>
-          <Text style={styles.nombre}>{lugar.lug_nombre}</Text>
-          <Ionicons name="bookmark-outline" size={26} color="#000" />
+        <Text style={styles.title}>{lugar.lug_nombre}</Text>
+
+        <Text style={styles.category}>Ruta {lugar.categoria}</Text>
+
+        <Text style={styles.sectionTitle}>Descripción</Text>
+        <Text style={styles.description}>{lugar.lug_descripcion}</Text>
+
+        <View style={styles.coordsRow}>
+          <View>
+            <Text style={styles.coordTitle}>Latitud</Text>
+            <Text style={styles.coordText}>{lugar.lug_latitud}</Text>
+          </View>
+
+          <View>
+            <Text style={styles.coordTitle}>Longitud</Text>
+            <Text style={styles.coordText}>{lugar.lug_longitud}</Text>
+          </View>
         </View>
 
-        <Text style={styles.rutaTexto}>
-          {lugar.categoria ? `Ruta ${lugar.categoria}` : "Sin categoría"}
-        </Text>
+        <Text style={styles.coordTitle}>Tags</Text>
+        <Text style={styles.tags}>{lugar.lug_tags}</Text>
 
-        <Text style={styles.label}>Descripción</Text>
-        <Text style={styles.descripcion}>{lugar.lug_descripcion}</Text>
+        <View style={styles.transportSection}>
+          <Text style={styles.transportTitle}>🚌 Cómo llegar</Text>
+          <Text style={styles.transportSubtitle}>
+            Rutas de transporte público cercanas a este destino
+          </Text>
 
-        <View style={styles.infoGrid}>
-          <View style={styles.infoBox}>
-            <Text style={styles.labelVerde}>Latitud</Text>
-            <Text style={styles.infoText}>
-              {lugar.lug_latitud ?? "Sin dato"}
+          {transportes.length === 0 ? (
+            <Text style={styles.noTransportText}>
+              No hay transporte disponible
             </Text>
-          </View>
+          ) : (
+            transportes.map((tp: Transporte) => {
+             const distancia = userLocation
+  ? calcularDistancia(
+      userLocation.lat,
+      userLocation.lng,
+      Number(lugar.lug_latitud),
+      Number(lugar.lug_longitud)
+    )
+  : 0;
 
-          <View style={styles.infoBox}>
-            <Text style={styles.labelVerde}>Longitud</Text>
-            <Text style={styles.infoText}>
-              {lugar.lug_longitud ?? "Sin dato"}
-            </Text>
-          </View>
+const tiempo = userLocation
+  ? Math.max(calcularTiempo(distancia, 20), 1)
+  : null;
+              return (
+                <View key={tp.tp_id} style={styles.transportCard}>
+                  <View style={styles.transportHeader}>
+                    <View
+                      style={[
+                        styles.transportColor,
+                        { backgroundColor: tp.tp_color || "#22B8D8" },
+                      ]}
+                    />
+                    <Text style={styles.transportName}>{tp.tp_nombre}</Text>
+                  </View>
 
-          <View style={styles.infoBoxFull}>
-            <Text style={styles.labelVerde}>Tags</Text>
-            <Text style={styles.infoText}>
-              {lugar.lug_tags || "Sin etiquetas"}
-            </Text>
-          </View>
+                  <Text style={styles.transportType}>{tp.tp_tipo}</Text>
+
+          <Text style={styles.transportTime}>
+  {tiempo
+    ? `⏱ Tiempo estimado: ${tiempo.toFixed(0)} min`
+    : "📍 Obteniendo tu ubicación..."}
+</Text>
+                  <Text style={styles.transportDescription}>
+                    {tp.tp_descripcion}
+                  </Text>
+                </View>
+              );
+            })
+          )}
         </View>
 
         <View style={styles.botonesRow}>
-         <TouchableOpacity
-  style={styles.botonRuta}
+        <TouchableOpacity
+  style={styles.btnRuta}
   onPress={() =>
     router.push({
       pathname: "/navegacionRuta",
       params: {
-        categoria: lugar.categoria || "",
         id: lugar.lug_id.toString(),
+        categoria: lugar.categoria,
       },
     })
   }
 >
-  <Text style={styles.textoBoton}>Ver Ruta</Text>
+  <Text style={styles.btnText}>Ver Ruta</Text>
 </TouchableOpacity>
-          <TouchableOpacity style={styles.botonCalificar}>
-            <Text style={styles.textoBoton}>Calificar</Text>
+
+          <TouchableOpacity style={styles.btnCalificar}>
+            <Text style={styles.btnText}>Calificar</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -150,18 +246,7 @@ export default function DetalleLugar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-
-  logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -85,
-  },
-
-  logo: {
-    width: "20%",
-    height: 120,
+    backgroundColor: "#FFFFFF",
   },
 
   center: {
@@ -169,102 +254,172 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  backButton: {
-    marginTop: 20,
-    marginLeft: 15,
-    marginBottom: 10,
-  },
-  imagenPrincipal: {
-    width: "90%",
+
+  image: {
+    width: "100%",
     height: 220,
-    alignSelf: "center",
-    borderRadius: 20,
-    backgroundColor: "#ddd",
-    marginTop: -15,
+    resizeMode: "cover",
   },
+
   content: {
     padding: 20,
   },
-  tituloRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 0,
-  },
-  nombre: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#000",
-    flex: 1,
-    marginRight: 10,
-  },
-  rutaTexto: {
-    fontSize: 18,
-    color: "#FF6600",
-    fontWeight: "bold",
-    marginTop: 4,
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#00AEEF",
+
+  title: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#111",
     marginBottom: 8,
   },
-  descripcion: {
-    fontSize: 15,
+
+  category: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#FF5A00",
+    marginBottom: 22,
+  },
+
+  sectionTitle: {
+    fontSize: 25,
+    fontWeight: "900",
+    color: "#22B8D8",
+    marginBottom: 10,
+  },
+
+  description: {
+    fontSize: 19,
+    color: "#333",
+    lineHeight: 28,
+    marginBottom: 22,
+  },
+
+  coordsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
+  coordTitle: {
+    fontSize: 20,
+    color: "#41B933",
+    fontWeight: "900",
+    marginBottom: 6,
+  },
+
+  coordText: {
+    fontSize: 18,
+    color: "#333",
+  },
+
+  tags: {
+    fontSize: 18,
     color: "#333",
     marginBottom: 20,
-    lineHeight: 22,
   },
-  infoGrid: {
+
+  transportSection: {
+    marginTop: 20,
+    marginBottom: 25,
+    backgroundColor: "#EAF9FC",
+    padding: 16,
+    borderRadius: 18,
+  },
+
+  transportTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#009CC6",
+    marginBottom: 4,
+  },
+
+  transportSubtitle: {
+    fontSize: 15,
+    color: "#555",
+    marginBottom: 14,
+  },
+
+  transportCard: {
+    backgroundColor: "#FFFFFF",
+    padding: 15,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderLeftWidth: 6,
+    borderLeftColor: "#22B8D8",
+    elevation: 3,
+  },
+
+  transportHeader: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
   },
-  infoBox: {
-    width: "48%",
-    marginBottom: 18,
+
+  transportColor: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    marginRight: 8,
   },
-  infoBoxFull: {
-    width: "100%",
-    marginBottom: 18,
+
+  transportName: {
+    fontSize: 21,
+    fontWeight: "900",
+    color: "#222",
   },
-  labelVerde: {
+
+  transportType: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#38B000",
+    fontWeight: "700",
+    color: "#41B933",
     marginBottom: 5,
   },
-  infoText: {
-    fontSize: 14,
-    color: "#333",
+
+  transportTime: {
+    fontSize: 15,
+    color: "#FF6B00",
+    fontWeight: "800",
+    marginBottom: 6,
   },
+
+  transportDescription: {
+    fontSize: 15,
+    color: "#555",
+    lineHeight: 21,
+  },
+
+  noTransportText: {
+    fontSize: 15,
+    color: "#777",
+    fontStyle: "italic",
+  },
+
   botonesRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 14,
     marginTop: 10,
     marginBottom: 30,
   },
-  botonRuta: {
+
+  btnRuta: {
+    flex: 1,
     backgroundColor: "#FF5A00",
-    paddingVertical: 14,
-    paddingHorizontal: 25,
-    borderRadius: 30,
-    width: "48%",
+    paddingVertical: 16,
+    borderRadius: 28,
     alignItems: "center",
   },
-  botonCalificar: {
-    backgroundColor: "#10BCEB",
-    paddingVertical: 14,
-    paddingHorizontal: 25,
-    borderRadius: 30,
-    width: "48%",
+
+  btnCalificar: {
+    flex: 1,
+    backgroundColor: "#22B8D8",
+    paddingVertical: 16,
+    borderRadius: 28,
     alignItems: "center",
   },
-  textoBoton: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+
+  btnText: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "900",
   },
 });
