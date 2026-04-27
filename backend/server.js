@@ -7,17 +7,7 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-
-const { Pool } = require("pg");
-
-// Configura los datos de TU base de datos de PostgreSQL
-const pool = new Pool({
-  user: "postgres",          // Tu usuario de pgAdmin
-  host: "localhost",
-  database: "exploratrc",    // El nombre de tu base de datos
-  password: "1234",          // Tu contraseña de pgAdmin
-  port: 5432,
-});
+const pool = require("./config/db"); //conexion
 
 
 //transportes
@@ -26,11 +16,15 @@ const transporteRoutes = require("./routes/transporteRoutes");
 // importar rutas de usuarios
 const userRoutes = require("./routes/userRoutes");
 
-// 🔥 🔹 NUEVO: importar rutas de rutas (gastronomica, cultura, etc.)
+//  importar rutas de rutas (gastronomica, cultura, etc.)
 const rutasRoutes = require("./routes/rutas");
 const detalleLugarRoutes = require("./routes/detallesLugarRuta");
 
+//Importa los favoritos
+const favoritoRoutes = require("./routes/favoritoRoutes");
+
 const app = express();
+
 
 const path = require('path');
 // Esto hace que al entrar a la IP, lo primero que vea el iPhone sean tus botones
@@ -43,9 +37,11 @@ app.use(express.json());
 // rutas existentes
 app.use("/api", userRoutes);
 
-// 🔥 🔹 NUEVO: usar rutas de rutas
+//  usar rutas de rutas
 app.use("/api", rutasRoutes);
 app.use("/api", detalleLugarRoutes);
+
+app.use("/api", favoritoRoutes); //Favoritos 
 //app.use("/api", detalleLugarRoutes);
 
 app.get("/api/transportes/lugar/:id", async (req, res) => {
@@ -79,7 +75,7 @@ const mapRoutes = require("./routes/mapRoutes");
 app.use("/api/maps", mapRoutes);
 console.log("mapRoutes:", mapRoutes);
 
-// 🔹 ruta raíz
+//  ruta raíz
 app.get("/", (req, res) => {
   res.send("API funcionando");
 });

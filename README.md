@@ -549,4 +549,37 @@ FROM transportes_lugares tl
 JOIN transportes_publicos t ON tl.tp_id = t.tp_id
 JOIN lugares l ON tl.lug_id = l.lug_id
 ORDER BY l.lug_nombre, t.tp_nombre;
+
+
+-- ==========================================
+-- 7. FAVORITOS (M:N)
+-- ==========================================
+CREATE TABLE favoritos (
+    usu_id INTEGER NOT NULL,
+    lug_id INTEGER NOT NULL,
+
+    PRIMARY KEY (usu_id, lug_id),
+
+    FOREIGN KEY (usu_id) 
+    REFERENCES usuarios(id) 
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (lug_id) 
+    REFERENCES lugares(lug_id) 
+    ON DELETE CASCADE
+);
+
+select * from favoritos;
  
+ ---Guardar Colores 
+
+ SELECT rut_nombre, rut_color FROM rutas;
+
+UPDATE rutas SET rut_color = '#FFF3EE' WHERE rut_nombre ILIKE 'Gastronomica';
+UPDATE rutas SET rut_color = '#7a2cbf23' WHERE rut_nombre ILIKE 'Cultura';
+UPDATE rutas SET rut_color = '#ffc4003c' WHERE rut_nombre ILIKE 'Entretenimiento';
+UPDATE rutas SET rut_color = '#00b4d834' WHERE rut_nombre ILIKE 'Night';
+UPDATE rutas SET rut_color = '#38b00059' WHERE rut_nombre ILIKE 'Familiar';
+
+ALTER TABLE rutas
+ALTER COLUMN rut_color TYPE VARCHAR(18);

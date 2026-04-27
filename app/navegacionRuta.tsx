@@ -1,15 +1,18 @@
+import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import MapWebView, { MapWebViewRef } from "../components/MapWebView";
-import API from "../services/api";
+import { SafeAreaView } from "react-native-safe-area-context";
+import API from "./../services/api";
+import MapWebView, { MapWebViewRef } from "./componentes/MapWebView";
 
 type Lugar = {
   lug_id: number;
@@ -21,18 +24,30 @@ type Lugar = {
   orden_en_ruta?: number;
 };
 
+type Ubicacion = {
+  lat: number;
+  lng: number;
+};
+
 export default function NavegacionRuta() {
   const params = useLocalSearchParams();
+
   const categoria = Array.isArray(params.categoria)
     ? params.categoria[0]
     : params.categoria;
+
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const [lugares, setLugares] = useState<Lugar[]>([]);
   const [loading, setLoading] = useState(true);
   const [indiceActual, setIndiceActual] = useState(0);
+  const [miUbicacion, setMiUbicacion] = useState<Ubicacion | null>(null);
 
   const mapRef = useRef<MapWebViewRef>(null);
+
+  useEffect(() => {
+    obtenerMiUbicacion();
+  }, []);
 
   useEffect(() => {
     if (categoria) {
@@ -44,26 +59,63 @@ export default function NavegacionRuta() {
 
   useEffect(() => {
     if (lugares.length > 0) {
-      const lugarActual = lugares[indiceActual];
+      const markers = lugares.map((lugar) => ({
+        id: lugar.lug_id,
+        lat: Number(lugar.lug_latitud),
+        lng: Number(lugar.lug_longitud),
+        title: lugar.lug_nombre,
+      }));
 
-      mapRef.current?.setSingleMarker({
-        lat: Number(lugarActual.lug_latitud),
-        lng: Number(lugarActual.lug_longitud),
-        title: lugarActual.lug_nombre,
-      });
+      setTimeout(() => {
+        mapRef.current?.setRouteMarkers({
+          markers,
+          activeIndex: indiceActual,
+          userLocation: miUbicacion,
+        });
+      }, 500);
     }
-  }, [lugares, indiceActual]);
+  }, [lugares, indiceActual, miUbicacion]);
+
+  const obtenerMiUbicacion = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        console.log("Permiso de ubicación denegado");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      setMiUbicacion({
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      });
+    } catch (error) {
+      console.log("Error obteniendo ubicación:", error);
+    }
+  };
 
   const obtenerLugaresRuta = async () => {
     try {
       const res = await API.get(
         `/lugares?categoria=${encodeURIComponent(categoria || "")}`
       );
-      const data = res.data;
-      setLugares(data);
 
-      const indiceInicial = data.findIndex(
-        (item: Lugar) => item.lug_id.toString() === id
+      const data: Lugar[] = res.data;
+
+      const lugaresOrdenados = [...data].sort((a, b) => {
+        const ordenA = a.orden_en_ruta ?? 0;
+        const ordenB = b.orden_en_ruta ?? 0;
+        return ordenA - ordenB;
+      });
+
+      setLugares(lugaresOrdenados);
+
+      const indiceInicial = lugaresOrdenados.findIndex(
+        (item) => item.lug_id.toString() === id
       );
 
       if (indiceInicial >= 0) {
@@ -90,6 +142,7 @@ export default function NavegacionRuta() {
 
   const irADetalle = () => {
     const lugarActual = lugares[indiceActual];
+
     router.push({
       pathname: "/detallesLugar",
       params: { id: lugarActual.lug_id.toString() },
@@ -98,94 +151,108 @@ export default function NavegacionRuta() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" color="#7B2CBF" />
         <Text style={styles.mensaje}>Cargando ruta...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!lugares.length) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <Text style={styles.mensaje}>
           No se encontraron lugares para esta ruta.
         </Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const lugarActual = lugares[indiceActual];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Ruta {categoria}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.titulo}>Ruta {categoria}</Text>
 
-      <Text style={styles.progreso}>
-        Punto {indiceActual + 1} de {lugares.length}
-      </Text>
+        <Text style={styles.progreso}>
+          Punto {indiceActual + 1} de {lugares.length}
+        </Text>
 
-      <MapWebView
-        ref={mapRef}
-        initialLat={Number(lugarActual.lug_latitud)}
-        initialLng={Number(lugarActual.lug_longitud)}
-      />
-
-      <View style={styles.card}>
-        <Image
-          source={{
-            uri:
-              lugarActual.imagen_principal_url ||
-              "https://via.placeholder.com/300",
-          }}
-          style={styles.imagen}
+        <MapWebView
+          ref={mapRef}
+          initialLat={Number(lugarActual.lug_latitud)}
+          initialLng={Number(lugarActual.lug_longitud)}
         />
 
-        <Text style={styles.nombre}>{lugarActual.lug_nombre}</Text>
-        <Text style={styles.descripcion}>{lugarActual.lug_descripcion}</Text>
+        <View style={styles.card}>
+          <Image
+            source={{
+              uri:
+                lugarActual.imagen_principal_url ||
+                "https://via.placeholder.com/300",
+            }}
+            style={styles.imagen}
+          />
 
-        <TouchableOpacity style={styles.botonDetalle} onPress={irADetalle}>
-          <Text style={styles.textoBotonDetalle}>Ver detalle</Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.nombre}>{lugarActual.lug_nombre}</Text>
+          <Text style={styles.descripcion}>{lugarActual.lug_descripcion}</Text>
 
-      <View style={styles.botonesRow}>
-        <TouchableOpacity
-          style={[
-            styles.botonNav,
-            indiceActual === 0 && styles.botonDeshabilitado,
-          ]}
-          onPress={anteriorLugar}
-          disabled={indiceActual === 0}
-        >
-          <Text style={styles.textoBoton}>Anterior</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.botonDetalle} onPress={irADetalle}>
+            <Text style={styles.textoBotonDetalle}>Ver detalle</Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.botonNav,
-            indiceActual === lugares.length - 1 && styles.botonDeshabilitado,
-          ]}
-          onPress={siguienteLugar}
-          disabled={indiceActual === lugares.length - 1}
-        >
-          <Text style={styles.textoBoton}>Siguiente</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <View style={styles.botonesRow}>
+          <TouchableOpacity
+            style={[
+              styles.botonNav,
+              indiceActual === 0 && styles.botonDeshabilitado,
+            ]}
+            onPress={anteriorLugar}
+            disabled={indiceActual === 0}
+          >
+            <Text style={styles.textoBoton}>Anterior</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.botonNav,
+              indiceActual === lugares.length - 1 && styles.botonDeshabilitado,
+            ]}
+            onPress={siguienteLugar}
+            disabled={indiceActual === lugares.length - 1}
+          >
+            <Text style={styles.textoBoton}>Siguiente</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 16,
+  },
+  contentContainer: {
+    paddingBottom: 50,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   mensaje: {
     marginTop: 12,
@@ -232,11 +299,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 14,
+    marginBottom: 20,
   },
   botonNav: {
     backgroundColor: "#7B2CBF",
     width: "48%",
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
   },

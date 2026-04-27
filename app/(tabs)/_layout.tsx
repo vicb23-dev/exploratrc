@@ -29,29 +29,7 @@ export default function TabLayout() {
         }}
       />
 
-     {/* BUSCAR */}
-      <Tabs.Screen
-        name="buscar"
-        options={{
-          title: "Buscar",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search" size={size} color={color} />
-          ),
-        }}
-      />
-
-      {/*  HOME */}
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-
-
+    
       {/*  UBICACIÓN */}
       <Tabs.Screen
         name="rutas"

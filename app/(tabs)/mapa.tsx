@@ -1,10 +1,10 @@
-//Esta será la pantalla nueva del mapa.
+import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
+  SafeAreaView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -16,7 +16,7 @@ import { getNearby, reversePlace, searchPlace } from "../../services/api";
 export default function MapScreen() {
   const [query, setQuery] = useState("");
   const [userLocation, setUserLocation] = useState({
-    lat: 25.5428, // Torreón por defecto
+    lat: 25.5428,
     lng: -103.4068,
   });
   const [loadingLocation, setLoadingLocation] = useState(false);
@@ -36,7 +36,7 @@ export default function MapScreen() {
       if (status !== "granted") {
         Alert.alert(
           "Permiso denegado",
-          "No se permitió acceder a la ubicación. Se mostrará Torreón por defecto.",
+          "No se permitió acceder a la ubicación."
         );
         return;
       }
@@ -56,11 +56,7 @@ export default function MapScreen() {
         title: "Mi ubicación",
       });
     } catch (error) {
-      console.log("Error obteniendo ubicación:", error);
-      Alert.alert(
-        "Error",
-        "No se pudo obtener la ubicación actual. Se mostrará Torreón por defecto.",
-      );
+      Alert.alert("Error", "No se pudo obtener la ubicación actual.");
     } finally {
       setLoadingLocation(false);
     }
@@ -88,7 +84,6 @@ export default function MapScreen() {
         title: first.display_name,
       });
     } catch (error) {
-      console.log("Error en búsqueda:", error);
       Alert.alert("Error", "No se pudo realizar la búsqueda");
     }
   };
@@ -98,18 +93,13 @@ export default function MapScreen() {
       const result = await reversePlace(lat, lng);
       Alert.alert("Ubicación", result.display_name || `${lat}, ${lng}`);
     } catch (error) {
-      console.log("Error en reversePlace:", error);
       Alert.alert("Error", "No se pudo obtener la dirección");
     }
   };
 
   const handleNearby = async () => {
     try {
-      const data = await getNearby(
-        userLocation.lat,
-        userLocation.lng,
-        "restaurant",
-      );
+      const data = await getNearby(userLocation.lat, userLocation.lng, "restaurant");
 
       const places = (data.elements || [])
         .map((item: any) => ({
@@ -126,89 +116,125 @@ export default function MapScreen() {
 
       mapRef.current?.setMultipleMarkers(places);
     } catch (error) {
-      console.log("Error cargando cercanos:", error);
       Alert.alert("Error", "No se pudieron cargar lugares cercanos");
     }
   };
 
+  const handleChatbot = () => {
+    Alert.alert("Chatbot", "Aquí irá el asistente virtual 🤖");
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mapa</Text>
-      <Text style={{ color: "red", fontSize: 22 }}>PRUEBA TORREÓN</Text>
-
-      <View style={styles.controls}>
-        <TextInput
-          style={styles.input}
-          placeholder="Buscar lugar"
-          value={query}
-          onChangeText={setQuery}
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleSearch}>
-          <Text style={styles.buttonText}>BUSCAR</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleNearby}>
-          <Text style={styles.buttonText}>CERCANOS</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={getCurrentLocation}
-          disabled={loadingLocation}
-        >
-          <Text style={styles.buttonText}>
-            {loadingLocation ? "OBTENIENDO UBICACIÓN..." : "MI UBICACIÓN"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+    <SafeAreaView style={styles.container}>
       <MapWebView
         ref={mapRef}
         initialLat={userLocation.lat}
         initialLng={userLocation.lng}
         onMapClick={handleMapClick}
       />
-    </View>
+
+      {/* Barra de búsqueda */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Buscar lugar..."
+          placeholderTextColor="#777"
+          value={query}
+          onChangeText={setQuery}
+          onSubmitEditing={handleSearch}
+        />
+        <TouchableOpacity onPress={handleSearch}>
+          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Botones flotantes */}
+      <View style={styles.floatingButtons}>
+        <TouchableOpacity style={styles.fab} onPress={handleNearby}>
+          <Ionicons name="restaurant" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={getCurrentLocation}
+          disabled={loadingLocation}
+        >
+          <Ionicons name="locate" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.fabChat} onPress={handleChatbot}>
+          <Ionicons name="chatbubble-ellipses" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 18,
-    marginTop: 50,
-    marginLeft: 20,
-    marginBottom: 10,
-  },
-  controls: {
-    paddingHorizontal: 12,
-    paddingBottom: 12,
-    backgroundColor: "#fff",
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 12,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  button: {
-    backgroundColor: "#2196F3",
-    paddingVertical: 15,
-    borderRadius: 4,
-    marginBottom: 12,
+
+  searchContainer: {
+    position: "absolute",
+    top: 15,
+    left: 70,   // deja libre la esquina del zoom
+    right: 20,
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    height: 52,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+
+  searchIcon: {
+    marginRight: 8,
+  },
+
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: "#000",
+  },
+
+  floatingButtons: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    gap: 12,
+  },
+
+  fab: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#2196F3",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+
+  fabChat: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#111",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
 });
