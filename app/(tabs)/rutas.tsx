@@ -42,15 +42,15 @@ export default function RutasScreen() {
             style={[styles.card, { backgroundColor: ruta.color }]}
             onPress={() => {
               if (ruta.nombre === "Ruta Gastronómica") {
-                router.push("/rutaGastronomica");
+                router.push("/(tabs)/rutaGastronomica");
               } else if (ruta.nombre === "Ruta Cultura") {
-                router.push("/rutaCultura");
+                router.push("/(tabs)/rutaCultura");
               } else if (ruta.nombre === "Ruta Entretenimiento") {
-                router.push("/rutaEntretenimiento" as any);
+                router.push("/(tabs)/rutaEntretenimiento" as any);
               } else if (ruta.nombre === "Ruta Night") {
-                router.push("/rutaNight");
+                router.push("/(tabs)/rutaNight");
               } else if (ruta.nombre === "Ruta Familiar") {
-                router.push("/rutaFamiliar");
+                router.push("/(tabs)/rutaFamiliar");
               }
             }}
           >

@@ -51,6 +51,19 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* PANTALLAS OCULTAS */}
+      <Tabs.Screen name="detallesLugar" options={{ href: null }} />
+      <Tabs.Screen name="navegacionRuta" options={{ href: null }} />
+      <Tabs.Screen name="rutaCultura" options={{ href: null }} />
+      <Tabs.Screen name="rutaEntretenimiento" options={{ href: null }} />
+      <Tabs.Screen name="rutaFamiliar" options={{ href: null }} />
+      <Tabs.Screen name="rutaGastronomica" options={{ href: null }} />
+      <Tabs.Screen name="rutaNight" options={{ href: null }} />
+      
     </Tabs>
   );
+
+
+ 
 }

@@ -130,18 +130,31 @@ export default function RutaLugares({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+  <View style={styles.container}>
+    {/* Flecha de regreso */}
 
-      <View style={[styles.header, { backgroundColor: headerColor }]}>
-        <Text style={styles.titulo}>{titulo}</Text>
-      </View>
+    <View style={styles.logoContainer}>
+      <TouchableOpacity
+        style={styles.backButtonTop}
+        onPress={() => router.replace("/(tabs)/rutas")}
+      >
+        <Ionicons name="arrow-back" size={24} color="#000" />
+      </TouchableOpacity>
+
+      <Image
+        source={require("../../assets/images/logo.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+    </View>
+
+    <View style={[styles.header, { backgroundColor: headerColor }]}>
+      <Text style={styles.titulo}>{titulo}</Text>
+    </View>
+
+
+
+
 
       {loading ? (
         <ActivityIndicator size="large" color={loaderColor} style={styles.loader} />
@@ -225,4 +238,11 @@ const styles = StyleSheet.create({
   botonCorazon: {
     marginLeft: 10,
   },
+
+backButtonTop: {
+  position: "absolute",
+  left: 15,
+  top: 40,
+  zIndex: 10,
+},
 });

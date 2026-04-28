@@ -1,4 +1,4 @@
-import RutaLugares from "./componentes/RutaComponentes";
+import RutaLugares from "../componentes/RutaComponentes";
 
 export default function RutaFamiliar() {
   return (

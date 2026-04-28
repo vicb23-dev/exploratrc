@@ -10,15 +10,17 @@ import {
   View,
 } from "react-native";
 
-import MapWebView, { MapWebViewRef } from "../../components/MapWebView";
-import { getNearby, reversePlace, searchPlace } from "../../services/api";
+import { reversePlace, searchPlace } from "../../services/api";
+import MapWebView, { MapWebViewRef } from "../componentes/MapWebView";
 
 export default function MapScreen() {
   const [query, setQuery] = useState("");
+
   const [userLocation, setUserLocation] = useState({
     lat: 25.5428,
     lng: -103.4068,
   });
+
   const [loadingLocation, setLoadingLocation] = useState(false);
 
   const mapRef = useRef<MapWebViewRef>(null);
@@ -53,7 +55,7 @@ export default function MapScreen() {
       mapRef.current?.setSingleMarker({
         lat,
         lng,
-        title: "Mi ubicación",
+        title: "Mi ubicación actual",
       });
     } catch (error) {
       Alert.alert("Error", "No se pudo obtener la ubicación actual.");
@@ -78,10 +80,22 @@ export default function MapScreen() {
 
       const first = results[0];
 
-      mapRef.current?.setSingleMarker({
-        lat: Number(first.lat),
-        lng: Number(first.lon),
-        title: first.display_name,
+      const placeLat = Number(first.lat);
+      const placeLng = Number(first.lon);
+
+      // NUEVO: evita error si la API devuelve coordenadas inválidas
+      if (Number.isNaN(placeLat) || Number.isNaN(placeLng)) {
+        Alert.alert("Error", "El lugar encontrado no tiene coordenadas válidas.");
+        return;
+      }
+
+      // NUEVO: dibuja ubicación actual + lugar buscado + línea punteada
+      mapRef.current?.drawUserToPlace({
+        userLat: userLocation.lat,
+        userLng: userLocation.lng,
+        placeLat,
+        placeLng,
+        placeTitle: first.display_name,
       });
     } catch (error) {
       Alert.alert("Error", "No se pudo realizar la búsqueda");
@@ -94,29 +108,6 @@ export default function MapScreen() {
       Alert.alert("Ubicación", result.display_name || `${lat}, ${lng}`);
     } catch (error) {
       Alert.alert("Error", "No se pudo obtener la dirección");
-    }
-  };
-
-  const handleNearby = async () => {
-    try {
-      const data = await getNearby(userLocation.lat, userLocation.lng, "restaurant");
-
-      const places = (data.elements || [])
-        .map((item: any) => ({
-          lat: item.lat || item.center?.lat,
-          lng: item.lon || item.center?.lon,
-          title: item.tags?.name || "Lugar cercano",
-        }))
-        .filter((p: any) => p.lat && p.lng);
-
-      if (!places.length) {
-        Alert.alert("Sin resultados", "No se encontraron lugares cercanos");
-        return;
-      }
-
-      mapRef.current?.setMultipleMarkers(places);
-    } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar lugares cercanos");
     }
   };
 
@@ -133,7 +124,6 @@ export default function MapScreen() {
         onMapClick={handleMapClick}
       />
 
-      {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
@@ -143,27 +133,28 @@ export default function MapScreen() {
           onChangeText={setQuery}
           onSubmitEditing={handleSearch}
         />
+
         <TouchableOpacity onPress={handleSearch}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <Ionicons
+            name="search"
+            size={24}
+            color="#666"
+            style={styles.searchIcon}
+          />
         </TouchableOpacity>
       </View>
 
-      {/* Botones flotantes */}
       <View style={styles.floatingButtons}>
-        <TouchableOpacity style={styles.fab} onPress={handleNearby}>
-          <Ionicons name="restaurant" size={24} color="#fff" />
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.fab}
           onPress={getCurrentLocation}
           disabled={loadingLocation}
         >
-          <Ionicons name="locate" size={24} color="#fff" />
+          <Ionicons name="locate" size={26} color="#fff" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.fabChat} onPress={handleChatbot}>
-          <Ionicons name="chatbubble-ellipses" size={24} color="#fff" />
+          <Ionicons name="chatbubble-ellipses" size={26} color="#fff" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -178,7 +169,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     position: "absolute",
     top: 15,
-    left: 70,   // deja libre la esquina del zoom
+    left: 70,
     right: 20,
     flexDirection: "row",
     alignItems: "center",

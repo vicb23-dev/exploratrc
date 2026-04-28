@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -11,8 +12,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import API from "./../services/api";
-import MapWebView, { MapWebViewRef } from "./componentes/MapWebView";
+import API from "../../services/api";
+import MapWebView, { MapWebViewRef } from "../componentes/MapWebView";
 
 type Lugar = {
   lug_id: number;
@@ -67,12 +68,15 @@ export default function NavegacionRuta() {
       }));
 
       setTimeout(() => {
-        mapRef.current?.setRouteMarkers({
-          markers,
-          activeIndex: indiceActual,
-          userLocation: miUbicacion,
-        });
-      }, 500);
+  if (!markers.length) return;
+
+  mapRef.current?.setRouteMarkers({
+    markers,
+    activeIndex: indiceActual,
+    userLocation: miUbicacion ?? null,
+  });
+}, 500);
+      
     }
   }, [lugares, indiceActual, miUbicacion]);
 
@@ -171,23 +175,45 @@ export default function NavegacionRuta() {
   const lugarActual = lugares[indiceActual];
 
   return (
+
+    
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.titulo}>Ruta {categoria}</Text>
+
+      <View style={styles.headerRow}>
+         <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => {
+          const lugarActual = lugares[indiceActual];
+
+          router.replace({
+            pathname: "/(tabs)/detallesLugar",
+            params: { id: lugarActual.lug_id.toString() },
+          });
+        }}
+      >
+        <Ionicons name="arrow-back" size={26} color="#000" />
+      </TouchableOpacity>
+
+      <Text style={styles.titulo}>Ruta {categoria}</Text>
+    </View>
+        
 
         <Text style={styles.progreso}>
           Punto {indiceActual + 1} de {lugares.length}
         </Text>
 
-        <MapWebView
-          ref={mapRef}
-          initialLat={Number(lugarActual.lug_latitud)}
-          initialLng={Number(lugarActual.lug_longitud)}
-        />
+        <View style={styles.mapContainer}>
+  <MapWebView
+    ref={mapRef}
+    initialLat={Number(lugarActual.lug_latitud)}
+    initialLng={Number(lugarActual.lug_longitud)}
+  />
+</View>
 
         <View style={styles.card}>
           <Image
@@ -263,8 +289,9 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#7B2CBF",
-    marginTop: 18,
+    marginTop: 20,
     marginBottom: 6,
+    
   },
   progreso: {
     fontSize: 14,
@@ -325,4 +352,26 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+
+  headerRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginTop: 15,
+},
+
+backButton: {
+  position: "absolute",
+  top: -18,
+  left: 2,
+  zIndex: 10,
+},
+
+mapContainer: {
+  height: 260,
+  marginTop: 18,
+  marginBottom: 20,
+  borderRadius: 18,
+  overflow: "hidden",
+  backgroundColor: "#ddd",
+},
 });
