@@ -68,15 +68,14 @@ export default function NavegacionRuta() {
       }));
 
       setTimeout(() => {
-  if (!markers.length) return;
+        if (!markers.length) return;
 
-  mapRef.current?.setRouteMarkers({
-    markers,
-    activeIndex: indiceActual,
-    userLocation: miUbicacion ?? null,
-  });
-}, 500);
-      
+        mapRef.current?.setRouteMarkers({
+          markers,
+          activeIndex: indiceActual,
+          userLocation: miUbicacion ?? null,
+        });
+      }, 500);
     }
   }, [lugares, indiceActual, miUbicacion]);
 
@@ -105,7 +104,7 @@ export default function NavegacionRuta() {
   const obtenerLugaresRuta = async () => {
     try {
       const res = await API.get(
-        `/lugares?categoria=${encodeURIComponent(categoria || "")}`
+        `/lugares?categoria=${encodeURIComponent(categoria || "")}`,
       );
 
       const data: Lugar[] = res.data;
@@ -119,7 +118,7 @@ export default function NavegacionRuta() {
       setLugares(lugaresOrdenados);
 
       const indiceInicial = lugaresOrdenados.findIndex(
-        (item) => item.lug_id.toString() === id
+        (item) => item.lug_id.toString() === id,
       );
 
       if (indiceInicial >= 0) {
@@ -175,45 +174,41 @@ export default function NavegacionRuta() {
   const lugarActual = lugares[indiceActual];
 
   return (
-
-    
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              const lugarActual = lugares[indiceActual];
 
-      <View style={styles.headerRow}>
-         <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => {
-          const lugarActual = lugares[indiceActual];
+              router.replace({
+                pathname: "/(tabs)/detallesLugar",
+                params: { id: lugarActual.lug_id.toString() },
+              });
+            }}
+          >
+            <Ionicons name="arrow-back" size={26} color="#000" />
+          </TouchableOpacity>
 
-          router.replace({
-            pathname: "/(tabs)/detallesLugar",
-            params: { id: lugarActual.lug_id.toString() },
-          });
-        }}
-      >
-        <Ionicons name="arrow-back" size={26} color="#000" />
-      </TouchableOpacity>
-
-      <Text style={styles.titulo}>Ruta {categoria}</Text>
-    </View>
-        
+          <Text style={styles.titulo}>Ruta {categoria}</Text>
+        </View>
 
         <Text style={styles.progreso}>
           Punto {indiceActual + 1} de {lugares.length}
         </Text>
 
         <View style={styles.mapContainer}>
-  <MapWebView
-    ref={mapRef}
-    initialLat={Number(lugarActual.lug_latitud)}
-    initialLng={Number(lugarActual.lug_longitud)}
-  />
-</View>
+          <MapWebView
+            ref={mapRef}
+            initialLat={Number(lugarActual.lug_latitud)}
+            initialLng={Number(lugarActual.lug_longitud)}
+          />
+        </View>
 
         <View style={styles.card}>
           <Image
@@ -291,7 +286,6 @@ const styles = StyleSheet.create({
     color: "#7B2CBF",
     marginTop: 20,
     marginBottom: 6,
-    
   },
   progreso: {
     fontSize: 14,
@@ -354,24 +348,24 @@ const styles = StyleSheet.create({
   },
 
   headerRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  marginTop: 15,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 15,
+  },
 
-backButton: {
-  position: "absolute",
-  top: -18,
-  left: 2,
-  zIndex: 10,
-},
+  backButton: {
+    position: "absolute",
+    top: -18,
+    left: 2,
+    zIndex: 10,
+  },
 
-mapContainer: {
-  height: 260,
-  marginTop: 18,
-  marginBottom: 20,
-  borderRadius: 18,
-  overflow: "hidden",
-  backgroundColor: "#ddd",
-},
+  mapContainer: {
+    height: 260,
+    marginTop: 18,
+    marginBottom: 20,
+    borderRadius: 18,
+    overflow: "hidden",
+    backgroundColor: "#ddd",
+  },
 });

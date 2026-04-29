@@ -6,8 +6,7 @@
 import axios from "axios";
 
 const API = axios.create({
-
-  baseURL: "http://192.168.1.3:5000/api",
+  baseURL: "http://192.168.1.7:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,10 +33,9 @@ export async function getNearby(lat, lon, type = "restaurant") {
   return res.data;
 }
 
-
 // ====================
 // TRANSPORTES
-// ==================== 
+// ====================
 
 export async function getTransportesPorLugar(id) {
   const res = await API.get(`/transportes/lugar/${id}`);

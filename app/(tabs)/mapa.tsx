@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { router } from "expo-router"; //import de chatbot
 import { reversePlace, searchPlace } from "../../services/api";
 import MapWebView, { MapWebViewRef } from "../componentes/MapWebView";
 
@@ -38,7 +39,7 @@ export default function MapScreen() {
       if (status !== "granted") {
         Alert.alert(
           "Permiso denegado",
-          "No se permitió acceder a la ubicación."
+          "No se permitió acceder a la ubicación.",
         );
         return;
       }
@@ -85,7 +86,10 @@ export default function MapScreen() {
 
       // NUEVO: evita error si la API devuelve coordenadas inválidas
       if (Number.isNaN(placeLat) || Number.isNaN(placeLng)) {
-        Alert.alert("Error", "El lugar encontrado no tiene coordenadas válidas.");
+        Alert.alert(
+          "Error",
+          "El lugar encontrado no tiene coordenadas válidas.",
+        );
         return;
       }
 
@@ -112,9 +116,8 @@ export default function MapScreen() {
   };
 
   const handleChatbot = () => {
-    Alert.alert("Chatbot", "Aquí irá el asistente virtual 🤖");
+    router.push("/chatbot" as any);
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <MapWebView
