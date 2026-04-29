@@ -95,4 +95,8 @@ Probar la aplicación
 nota: Asegúrate de que el backend esté corriendo primero en el puerto 5000, ya que la aplicación móvil se conecta a este servidor mediante el archivo: service/ api.js (CHECARLO)
 S
 
+-----------------------------------
+Módulo de Rutas Temáticas - Explora TRC 
+
+Este módulo añade la funcionalidad de rutas turísticas dinámicas (Gastronomía, Cultura, Night, Entretenimiento y Familiar) conectadas a PostgreSQL.
 
