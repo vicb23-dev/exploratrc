@@ -22,7 +22,7 @@ async function cargarLugares(categoria) {
 
   try {
     // IMPORTANTE: Cambia 'localhost' por tu IP (ej. 192.168.100.154) si pruebas en iPhone
-    const response = await fetch(`http:/10.19.139.235:5000/lugares?categoria=${categoria}`);
+    const response = await fetch(`http:/192.168.100.154:5000/lugares?categoria=${categoria}`);
     const datos = await response.json();
 
     limpiarMapa();

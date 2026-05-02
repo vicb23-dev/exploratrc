@@ -487,3 +487,668 @@ UPDATE rutas SET rut_color = '#38b00059' WHERE rut_nombre ILIKE 'Familiar';
 ALTER TABLE rutas
 ALTER COLUMN rut_color TYPE VARCHAR(18);
 
+------------------------------------------------------------------------
+-- NUEVOS LUGARES RUTA ENTRETENIMIENTO
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Casa Sigart',
+'Aprende cerámica desde cero en Torreón. Nosotros te guiamos paso a paso.',
+25.56229990, -103.43933070,
+'https://casasigart.com/wp-content/uploads/2025/01/recoleccion.png',
+'entretenimiento, manualidades, cafeteria, relajante'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Casa Sigart'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Placard',
+'Espacio de talleres creativos para niños y adultos con un enfoque de arte para todos.',
+25.54202000, -103.45395000,
+'https://maps.app.goo.gl/x3wdjZLPEVvrqZ6v7',
+'entretenimiento, familiar, manualidades, divertido'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Placard'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Panal TRC',
+'Talleres de arte y manualidades para realizar durante la semana o el fin de semana. Para jovenes y adultos.',
+25.54085000, -103.45090000,
+'https://aspertxu.com/images/IMG-20210327-WA0002.jpg',
+'entretenimiento, creatividad, jovenes, adultos'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Panal TRC'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Espacio Creativo x MM Ceramica',
+'Un estudio enfocado en la comunidad creativa que ofrece talleres de ceramica, escultura y dibujo, ideales para materializar ideas en un ambiente de convivencia.',
+25.53713010, -103.42770990,
+NULL,
+'entretenimiento, creativo, adultos, manualidades'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Espacio Creativo x MM Ceramica'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Colorea - Taller de Pintura',
+'Ofrecen una experiencia de pintura decorativa donde puedes experimentar con acrilico, acuarela, oleo, hoja de oro y texturas.',
+25.59590000, -103.40980000,
+'https://maps.app.goo.gl/Jg9U4zZU2gCoQmEAA',
+'entretenimiento, pintura, familiar, divertido'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Colorea - Taller de Pintura'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Colores - Clases de Pintura en Torreon',
+'Clases de pintura para bebes, niños, jovenes y adultos.',
+25.53390000, -103.41750000,
+'https://maps.app.goo.gl/RBVdPMqpNCohoGCR9',
+'entretenimiento, pintura, familiar, creativo'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Colores - Clases de Pintura en Torreon'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Casa de Arte Lila',
+'Ofrece clases de pintura para adultos enfocadas en perder el miedo a tecnicas tradicionales como oleo o acuarela.',
+25.52298730, -103.40244970,
+'https://maps.app.goo.gl/P69XQJQMBjTpKF16A',
+'entretenimiento, pintura, adultos, acuarelas'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Casa de Arte Lila'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Kanvaa',
+'Organizan eventos de Drink and Draw en diferentes sedes de la ciudad, uniendo el dibujo con un ambiente relajado de bar o cafeteria.',
+25.56260000, -103.41080000,
+'https://maps.app.goo.gl/PQeBbVngyfeXAkbY7',
+'entretenimiento, dibujo, adultos, bebidas'
+WHERE NOT EXISTS (
+    SELECT 1 FROM lugares WHERE lug_nombre = 'Kanvaa'
+);
+
+
+-- ASOCIARLOS A RUTA ENTRETENIMIENTO
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 5
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Casa Sigart'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 6
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Placard'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 7
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Panal TRC'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 8
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Espacio Creativo x MM Ceramica'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 9
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Colorea - Taller de Pintura'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 10
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Colores - Clases de Pintura en Torreon'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 11
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Casa de Arte Lila'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 12
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Kanvaa'
+AND r.rut_nombre = 'Entretenimiento'
+ON CONFLICT DO NOTHING;
+
+
+--PARA VERIFICAR QUE SE AGREGARON (OPC)
+SELECT 
+    l.lug_id,
+    l.lug_nombre,
+    r.rut_nombre,
+    lr.orden_en_ruta
+FROM lugares_rutas lr
+JOIN lugares l ON lr.lug_id = l.lug_id
+JOIN rutas r ON lr.rut_id = r.rut_id
+WHERE r.rut_nombre = 'Entretenimiento'
+ORDER BY lr.orden_en_ruta;
+
+--ASOCIAR EL TRANSPORTE A LOS NUEVOS LUGARES
+
+-- Casa Sigart
+-- Zona Nueva Los Ángeles / cerca de Independencia
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Aeropuerto'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Sigart')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Dorada'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Sigart')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Sigart'))
+ON CONFLICT DO NOTHING;
+
+
+-- Placard
+-- Zona Centro / Matamoros
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Placard')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Placard')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Placard'))
+ON CONFLICT DO NOTHING;
+
+
+-- Panal TRC
+-- Zona Centro / Morelos
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Panal TRC')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Panal TRC')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Panal TRC'))
+ON CONFLICT DO NOTHING;
+
+
+-- Espacio Creativo x MM Ceramica
+-- Zona Oriente / Hidalgo
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Santa Fe'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Espacio Creativo x MM Ceramica')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'San Joaquín'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Espacio Creativo x MM Ceramica')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Norte'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Espacio Creativo x MM Ceramica'))
+ON CONFLICT DO NOTHING;
+
+
+-- Colorea - Taller de Pintura
+-- Zona Senderos
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Aeropuerto'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colorea - Taller de Pintura')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colorea - Taller de Pintura')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Los Laureles'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colorea - Taller de Pintura'))
+ON CONFLICT DO NOTHING;
+
+
+-- Colores - Clases de Pintura en Torreon
+-- Zona Torreón Jardín
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Triángulo Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colores - Clases de Pintura en Torreon')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Sur Jardines'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colores - Clases de Pintura en Torreon')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Valle Oriente Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Colores - Clases de Pintura en Torreon'))
+ON CONFLICT DO NOTHING;
+
+
+-- Casa de Arte Lila
+-- Zona Torreón Residencial / Gómez Morin
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Sur Jardines'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa de Arte Lila')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Valle Oriente Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa de Arte Lila')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'San Joaquín'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa de Arte Lila'))
+ON CONFLICT DO NOTHING;
+
+
+-- Kanvaa
+-- Zona Blvd. Independencia / El Fresno
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Aeropuerto'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Kanvaa')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Magdalenas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Kanvaa')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Kanvaa'))
+ON CONFLICT DO NOTHING;
+
+
+
+--PARA VERIFICAR QUE SI SE ASOCIARON LOS TRANSPORTES (OPC)
+SELECT 
+  l.lug_nombre,
+  t.tp_nombre,
+  t.tp_tipo,
+  t.tp_color
+FROM transportes_lugares tl
+JOIN lugares l ON tl.lug_id = l.lug_id
+JOIN transportes_publicos t ON tl.tp_id = t.tp_id
+WHERE l.lug_nombre IN (
+  'Casa Sigart',
+  'Placard',
+  'Panal TRC',
+  'Espacio Creativo x MM Ceramica',
+  'Colorea - Taller de Pintura',
+  'Colores - Clases de Pintura en Torreon',
+  'Casa de Arte Lila',
+  'Kanvaa'
+)
+ORDER BY l.lug_nombre, t.tp_nombre;
+
+--PARA VERIFICAR QUE SI SE MANDAN ALEATORIAMENTE 5 LUGARES (OPC)
+SELECT 
+  l.lug_nombre
+FROM lugares l
+JOIN lugares_rutas lr ON l.lug_id = lr.lug_id
+JOIN rutas r ON lr.rut_id = r.rut_id
+WHERE r.rut_nombre ILIKE 'Entretenimiento'
+ORDER BY RANDOM()
+LIMIT 5;
+
+--Actualizacion de imagenes para los nuevos lugares
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/f_auto,q_auto/Captura_de_pantalla_2026-05-01_222823_ikqct3'
+WHERE lug_nombre = 'Casa Sigart';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777696732/Captura_de_pantalla_2026-05-01_223802_atxfyv.png'
+WHERE lug_nombre = 'Placard';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777697113/Captura_de_pantalla_2026-05-01_224438_hymfjp.png'
+WHERE lug_nombre = 'Espacio Creativo x MM Ceramica';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777697270/Captura_de_pantalla_2026-05-01_224621_e03cdj.png'
+WHERE lug_nombre = 'Colorea - Taller de Pintura';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777697345/Captura_de_pantalla_2026-05-01_224836_avzxju.png'
+WHERE lug_nombre = 'Colores - Clases de Pintura en Torreon';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777697462/Captura_de_pantalla_2026-05-01_225050_a2kzqq.png'
+WHERE lug_nombre = 'Casa de Arte Lila';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777697634/Captura_de_pantalla_2026-05-01_225340_koq8mq.png'
+WHERE lug_nombre = 'Kanvaa';
+
+------------------------------------------------------------------------
+-- NUEVOS LUGARES RUTA CULTURAL
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo Casa del Cerro',
+'Historia de la ciudad en una edificacion singular.',
+25.53590000, -103.46290000,
+NULL,
+'cultural, museo, historia, adultos'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo Casa del Cerro'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo Regional de la Laguna',
+'Arqueologia y etnografia de la region.',
+25.54550000, -103.43820000,
+NULL,
+'cultural, historia, museo, familiar'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo Regional de la Laguna'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo de la Revolucion',
+'Enfocado en la historia de la Revolucion Mexicana.',
+25.54190000, -103.44430000,
+NULL,
+'cultural, revolucion, museo, historia'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo de la Revolucion'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo de los Metales',
+'Enfocado en la mineria y metalurgia.',
+25.52313971, -103.44647529,
+NULL,
+'cultural, museo, mineria, historia'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo de los Metales'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Centro Cultural Casa Mudejar',
+'Espacio de exposiciones y eventos artisticos.',
+25.54220000, -103.45400000,
+NULL,
+'cultural, exposiciones, arte, familiar'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Centro Cultural Casa Mudejar'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Centro Cultural Antigua Harinera',
+'Espacio dedicado a diversas disciplinas artisticas.',
+25.53890000, -103.45990000,
+NULL,
+'cultural, arte, familiar, historia'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Centro Cultural Antigua Harinera'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo de La Moneda',
+'Recinto cultural ubicado en la boveda del antiguo Banco de Mexico.',
+25.54090000, -103.44980000,
+NULL,
+'cultural, moneda, historia, adultos'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo de La Moneda'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo del Algodon',
+'Expone la historia industrial de nuestra region.',
+25.54200000, -103.45480000,
+NULL,
+'cultural, industrial, adultos, regional'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo del Algodon'
+);
+
+INSERT INTO lugares 
+(lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags)
+SELECT 'Museo Paleontologico de la Laguna',
+'Enfocado en exhibicion de especimenes y fosiles de animales.',
+25.54240000, -103.45390000,
+NULL,
+'cultural, museo, fosiles, familiar'
+WHERE NOT EXISTS (
+  SELECT 1 FROM lugares WHERE lug_nombre = 'Museo Paleontologico de la Laguna'
+);
+
+
+-- ASOCIAR A RUTA CULTURA
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 5
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo Casa del Cerro'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 6
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo Regional de la Laguna'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 7
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo de la Revolucion'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 8
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo de los Metales'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 9
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Centro Cultural Casa Mudejar'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 10
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Centro Cultural Antigua Harinera'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 11
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo de La Moneda'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 12
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo del Algodon'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta)
+SELECT l.lug_id, r.rut_id, 13
+FROM lugares l, rutas r
+WHERE l.lug_nombre = 'Museo Paleontologico de la Laguna'
+AND r.rut_nombre = 'Cultura'
+ON CONFLICT DO NOTHING;
+
+--CONSULTA PARA VERIFICAR SI SE AGREGARON (opc)
+SELECT 
+  l.lug_id,
+  l.lug_nombre,
+  r.rut_nombre,
+  lr.orden_en_ruta,
+  l.imagen_principal_url
+FROM lugares_rutas lr
+JOIN lugares l ON lr.lug_id = l.lug_id
+JOIN rutas r ON lr.rut_id = r.rut_id
+WHERE r.rut_nombre = 'Cultura'
+ORDER BY lr.orden_en_ruta;
+
+
+-- TRANSPORTES PARA NUEVOS LUGARES CULTURALES
+-- Museo Casa del Cerro
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Primero de Mayo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Casa del Cerro')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Casa del Cerro')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Casa del Cerro'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo Regional de la Laguna
+-- Está dentro/zona Bosque Venustiano Carranza
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Triángulo Rojo'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Regional de la Laguna')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Regional de la Laguna')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Independencia-Aeropuerto'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Regional de la Laguna'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo de la Revolucion
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de la Revolucion')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de la Revolucion')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de la Revolucion'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo de los Metales
+-- Zona Metalúrgica
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Metalúrgica'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de los Metales')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Panteones'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de los Metales')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Sur Jardines'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de los Metales'))
+ON CONFLICT DO NOTHING;
+
+
+-- Centro Cultural Casa Mudejar
+-- Zona Centro
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Casa Mudejar')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Casa Mudejar')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Casa Mudejar'))
+ON CONFLICT DO NOTHING;
+
+
+-- Centro Cultural Antigua Harinera
+-- Zona Centro / Blvd Revolución
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Antigua Harinera')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Antigua Harinera')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Metalúrgica'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Centro Cultural Antigua Harinera'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo de La Moneda
+-- Zona Morelos / Centro
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de La Moneda')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de La Moneda')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo de La Moneda'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo del Algodon
+-- Zona Centro
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Algodon')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Algodon')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Polvorera'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo del Algodon'))
+ON CONFLICT DO NOTHING;
+
+
+-- Museo Paleontologico de la Laguna
+-- Zona Centro / Av. Juárez
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Campo Alianza'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Paleontologico de la Laguna')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Jacarandas'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Paleontologico de la Laguna')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre = 'Santa Fe'),
+ (SELECT lug_id FROM lugares WHERE lug_nombre = 'Museo Paleontologico de la Laguna'))
+ON CONFLICT DO NOTHING;
+
+
+-- VERIFICAR QUE SE ASOCIARON EL TRANSPORTE
+SELECT 
+  l.lug_nombre,
+  t.tp_nombre,
+  t.tp_tipo,
+  t.tp_color
+FROM transportes_lugares tl
+JOIN lugares l ON tl.lug_id = l.lug_id
+JOIN transportes_publicos t ON tl.tp_id = t.tp_id
+WHERE l.lug_nombre IN (
+  'Museo Casa del Cerro',
+  'Museo Regional de la Laguna',
+  'Museo de la Revolucion',
+  'Museo de los Metales',
+  'Centro Cultural Casa Mudejar',
+  'Centro Cultural Antigua Harinera',
+  'Museo de La Moneda',
+  'Museo del Algodon',
+  'Museo Paleontologico de la Laguna'
+)
+ORDER BY l.lug_nombre, t.tp_nombre;
+
+--IMAGENES ACTUALIZADAS DE NUEVOS LUGARES CULTURA
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701203/Captura_de_pantalla_2026-05-01_235259_uulaq3.png'
+WHERE lug_nombre = 'Museo Casa del Cerro';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701579/Captura_de_pantalla_2026-05-01_235916_jqmafc.png'
+WHERE lug_nombre = 'Museo Regional de la Laguna';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701671/Captura_de_pantalla_2026-05-02_000045_eacpft.png'
+WHERE lug_nombre = 'Museo de la Revolucion';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701736/Captura_de_pantalla_2026-05-02_000203_urkgqo.png'
+WHERE lug_nombre = 'Museo de los Metales';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701824/Captura_de_pantalla_2026-05-02_000334_ayvp54.png'
+WHERE lug_nombre = 'Centro Cultural Casa Mudejar';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701928/Captura_de_pantalla_2026-05-02_000513_gldamz.png'
+WHERE lug_nombre = 'Centro Cultural Antigua Harinera';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777701991/Captura_de_pantalla_2026-05-02_000620_ehknou.png'
+WHERE lug_nombre = 'Museo de La Moneda';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777702073/Captura_de_pantalla_2026-05-02_000741_j5iitc.png'
+WHERE lug_nombre = 'Museo del Algodon';
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/dr3nbvham/image/upload/v1777702154/Captura_de_pantalla_2026-05-02_000904_ay5sp8.png'
+WHERE lug_nombre = 'Museo Paleontologico de la Laguna';

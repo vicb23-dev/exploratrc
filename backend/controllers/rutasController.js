@@ -16,7 +16,8 @@ const obtenerPorCategoria = async (req, res) => {
       JOIN lugares_rutas lr ON l.lug_id = lr.lug_id
       JOIN rutas r ON r.rut_id = lr.rut_id
       WHERE r.rut_nombre ILIKE $1
-      ORDER BY lr.orden_en_ruta
+      ORDER BY RANDOM()
+      LIMIT 5
     `, [categoria]);
 
     res.json(result.rows);
