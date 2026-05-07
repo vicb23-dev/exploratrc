@@ -32,12 +32,7 @@ type Transporte = {
   tp_descripcion: string;
 };
 
-function calcularDistancia(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) {
+function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -49,37 +44,46 @@ function calcularDistancia(
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
 function calcularTiempo(distancia: number, velocidad: number) {
   return (distancia / velocidad) * 60;
 }
 
-export default function detallesLugar() {
-  const { id } = useLocalSearchParams();
+export default function DetallesLugar() {
+  const { id, exp_id, nombre } = useLocalSearchParams();
   const router = useRouter();
+
+  const idTexto = Array.isArray(id) ? id[0] : id;
+  const expIdTexto = Array.isArray(exp_id) ? exp_id[0] : exp_id;
+  const nombreTexto = Array.isArray(nombre) ? nombre[0] : nombre;
 
   const [lugar, setLugar] = useState<LugarDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [transportes, setTransportes] = useState<Transporte[]>([]);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [esFavorito, setEsFavorito] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    obtenerUbicacionUsuario();
+
+    if (idTexto) {
+      obtenerDetalleLugar();
+      obtenerTransportes();
+    }
+  }, [idTexto]);
+
+  useEffect(() => {
+    if (lugar) verificarFavorito();
+  }, [lugar]);
 
   const obtenerUbicacionUsuario = async () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status !== "granted") {
-        console.log("Permiso de ubicación denegado");
-        return;
-      }
+      if (status !== "granted") return;
 
       const location = await Location.getCurrentPositionAsync({});
-
       setUserLocation({
         lat: location.coords.latitude,
         lng: location.coords.longitude,
@@ -89,18 +93,9 @@ export default function detallesLugar() {
     }
   };
 
-  useEffect(() => {
-    obtenerUbicacionUsuario();
-
-    if (id) {
-      obtenerDetalleLugar();
-      obtenerTransportes();
-    }
-  }, [id]);
-
   const obtenerDetalleLugar = async () => {
     try {
-      const res = await API.get(`/lugares/${id}`);
+      const res = await API.get(`/lugares/${idTexto}`);
       setLugar(res.data);
     } catch (error) {
       console.log("Error al obtener lugar:", error);
@@ -111,10 +106,73 @@ export default function detallesLugar() {
 
   const obtenerTransportes = async () => {
     try {
-      const data = await getTransportesPorLugar(id);
+      if (!idTexto) return;
+      const data = await getTransportesPorLugar(idTexto);
       setTransportes(data);
     } catch (error) {
       console.log("Error transportes:", error);
+    }
+  };
+
+  const verificarFavorito = async () => {
+    try {
+      if (!lugar) return;
+
+      const res = await API.get("/favoritos/1");
+      const existe = res.data.some((fav: any) => fav.lug_id === lugar.lug_id);
+
+      setEsFavorito(existe);
+    } catch (error) {
+      console.log("Error verificando favorito:", error);
+    }
+  };
+
+  const toggleFavorito = async () => {
+    try {
+      if (!lugar) return;
+
+      if (esFavorito) {
+        await API.delete(`/favoritos/1/${lugar.lug_id}`);
+        setEsFavorito(false);
+        alert("Lugar eliminado de favoritos");
+      } else {
+        await API.post("/favoritos", {
+          usu_id: 1,
+          lug_id: lugar.lug_id,
+        });
+        setEsFavorito(true);
+        alert("Lugar agregado a favoritos");
+      }
+    } catch (error) {
+      console.log("Error favoritos:", error);
+      alert("No se pudo actualizar favoritos");
+    }
+  };
+
+  const regresar = () => {
+    if (expIdTexto) {
+      router.replace({
+        pathname: "/(tabs)/navegacionRuta" as any,
+        params: {
+          exp_id: expIdTexto,
+          nombre: nombreTexto || "",
+        },
+      });
+      return;
+    }
+
+    if (lugar?.categoria === "Cultura") {
+      router.replace("/(tabs)/rutaCultura");
+    } else if (lugar?.categoria === "Gastronomica") {
+      router.replace("/experienciasRuta" as any);
+    } else if (lugar?.categoria === "Entretenimiento") {
+      router.replace("/(tabs)/rutaEntretenimiento");
+    } else if (lugar?.categoria === "Night") {
+      router.replace("/(tabs)/rutaNight");
+    } else if (lugar?.categoria === "Familiar") {
+      router.replace("/(tabs)/rutaFamiliar");
+    } else {
+      router.replace("/(tabs)/rutas");
     }
   };
 
@@ -138,42 +196,19 @@ export default function detallesLugar() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: lugar.imagen_principal_url }}
-            style={styles.image}
-          />
+          <Image source={{ uri: lugar.imagen_principal_url }} style={styles.image} />
 
-         {/*Flecha de regreso */}
-          <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            if (lugar.categoria === "Cultura") {
-              router.replace("/(tabs)/rutaCultura");
-            } else if (lugar.categoria === "Gastronomica") {
-              router.replace("/(tabs)/rutaGastronomica");
-            } else if (lugar.categoria === "Entretenimiento") {
-              router.replace("/(tabs)/rutaEntretenimiento");
-            } else if (lugar.categoria === "Night") {
-              router.replace("/(tabs)/rutaNight");
-            } else if (lugar.categoria === "Familiar") {
-              router.replace("/(tabs)/rutaFamiliar");
-            } else {
-              router.replace("/(tabs)/rutas");
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={26} color="#111" />
-        </TouchableOpacity>
-
-
-
-
+          <TouchableOpacity style={styles.backButton} onPress={regresar}>
+            <Ionicons name="arrow-back" size={26} color="#111" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
           <Text style={styles.title}>{lugar.lug_nombre}</Text>
 
-          <Text style={styles.category}>Ruta {lugar.categoria}</Text>
+          <Text style={styles.category}>
+            {expIdTexto ? nombreTexto || "Experiencia gastronómica" : `Ruta ${lugar.categoria}`}
+          </Text>
 
           <Text style={styles.sectionTitle}>Descripción</Text>
           <Text style={styles.description}>{lugar.lug_descripcion}</Text>
@@ -200,9 +235,7 @@ export default function detallesLugar() {
             </Text>
 
             {transportes.length === 0 ? (
-              <Text style={styles.noTransportText}>
-                No hay transporte disponible
-              </Text>
+              <Text style={styles.noTransportText}>No hay transporte disponible</Text>
             ) : (
               transportes.map((tp: Transporte) => {
                 const distancia = userLocation
@@ -214,9 +247,7 @@ export default function detallesLugar() {
                     )
                   : 0;
 
-                const tiempo = userLocation
-                  ? Math.max(calcularTiempo(distancia, 20), 1)
-                  : null;
+                const tiempo = userLocation ? Math.max(calcularTiempo(distancia, 20), 1) : null;
 
                 return (
                   <View key={tp.tp_id} style={styles.transportCard}>
@@ -238,9 +269,7 @@ export default function detallesLugar() {
                         : "📍 Obteniendo tu ubicación..."}
                     </Text>
 
-                    <Text style={styles.transportDescription}>
-                      {tp.tp_descripcion}
-                    </Text>
+                    <Text style={styles.transportDescription}>{tp.tp_descripcion}</Text>
                   </View>
                 );
               })
@@ -248,19 +277,16 @@ export default function detallesLugar() {
           </View>
 
           <View style={styles.botonesRow}>
-            <TouchableOpacity
-              style={styles.btnRuta}
-              onPress={() =>
-                router.push({
-                  pathname: "/(tabs)/navegacionRuta",
-                  params: {
-                    id: lugar.lug_id.toString(),
-                    categoria: lugar.categoria,
-                  },
-                })
-              }
-            >
-              <Text style={styles.btnText}>Ver Ruta</Text>
+            <TouchableOpacity style={styles.btnRuta} onPress={toggleFavorito}>
+              <Ionicons name={esFavorito ? "heart" : "heart-outline"} size={22} color="#fff" />
+              <Text style={styles.btnText}>
+                {esFavorito ? "Quitar de favoritos" : "Añadir a favoritos"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.btnVolver} onPress={regresar}>
+              <Ionicons name="return-up-back" size={22} color="#fff" />
+              <Text style={styles.btnText}>Volver a experiencia</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -274,28 +300,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-
   imageContainer: {
     position: "relative",
   },
-
   image: {
     width: "100%",
     height: 220,
     resizeMode: "cover",
   },
-
   backButton: {
     position: "absolute",
     top: 18,
@@ -308,63 +329,53 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
-
   content: {
     padding: 20,
   },
-
   title: {
     fontSize: 32,
     fontWeight: "900",
     color: "#111",
     marginBottom: 8,
   },
-
   category: {
     fontSize: 24,
     fontWeight: "800",
     color: "#FF5A00",
     marginBottom: 22,
   },
-
   sectionTitle: {
     fontSize: 25,
     fontWeight: "900",
     color: "#22B8D8",
     marginBottom: 10,
   },
-
   description: {
     fontSize: 19,
     color: "#333",
     lineHeight: 28,
     marginBottom: 22,
   },
-
   coordsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
   },
-
   coordTitle: {
     fontSize: 20,
     color: "#41B933",
     fontWeight: "900",
     marginBottom: 6,
   },
-
   coordText: {
     fontSize: 18,
     color: "#333",
   },
-
   tags: {
     fontSize: 18,
     color: "#333",
     marginBottom: 20,
   },
-
   transportSection: {
     marginTop: 20,
     marginBottom: 25,
@@ -372,20 +383,17 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
   },
-
   transportTitle: {
     fontSize: 28,
     fontWeight: "900",
     color: "#009CC6",
     marginBottom: 4,
   },
-
   transportSubtitle: {
     fontSize: 15,
     color: "#555",
     marginBottom: 14,
   },
-
   transportCard: {
     backgroundColor: "#FFFFFF",
     padding: 15,
@@ -395,65 +403,69 @@ const styles = StyleSheet.create({
     borderLeftColor: "#22B8D8",
     elevation: 3,
   },
-
   transportHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 6,
   },
-
   transportColor: {
     width: 14,
     height: 14,
     borderRadius: 7,
     marginRight: 8,
   },
-
   transportName: {
     fontSize: 21,
     fontWeight: "900",
     color: "#222",
   },
-
   transportType: {
     fontSize: 16,
     fontWeight: "700",
     color: "#41B933",
     marginBottom: 5,
   },
-
   transportTime: {
     fontSize: 15,
     color: "#FF6B00",
     fontWeight: "800",
     marginBottom: 6,
   },
-
   transportDescription: {
     fontSize: 15,
     color: "#555",
     lineHeight: 21,
   },
-
   noTransportText: {
     fontSize: 15,
     color: "#777",
     fontStyle: "italic",
   },
-
   botonesRow: {
     marginTop: 10,
     marginBottom: 30,
   },
-
   btnRuta: {
     width: "100%",
     backgroundColor: "#FF5A00",
     paddingVertical: 16,
     borderRadius: 28,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
   },
-
+  btnVolver: {
+    width: "100%",
+    backgroundColor: "#111",
+    paddingVertical: 16,
+    borderRadius: 28,
+    alignItems: "center",
+    marginTop: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+  },
   btnText: {
     color: "#FFFFFF",
     fontSize: 20,

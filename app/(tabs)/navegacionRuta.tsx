@@ -23,6 +23,8 @@ type Lugar = {
   lug_latitud: number;
   lug_longitud: number;
   orden_en_ruta?: number;
+  orden_en_experiencia?: number;
+  momento?: string;
 };
 
 type Ubicacion = {
@@ -36,6 +38,14 @@ export default function NavegacionRuta() {
   const categoria = Array.isArray(params.categoria)
     ? params.categoria[0]
     : params.categoria;
+
+  const exp_id = Array.isArray(params.exp_id)
+    ? params.exp_id[0]
+    : params.exp_id;
+
+  const nombre = Array.isArray(params.nombre)
+    ? params.nombre[0]
+    : params.nombre;
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -51,12 +61,12 @@ export default function NavegacionRuta() {
   }, []);
 
   useEffect(() => {
-    if (categoria) {
+    if (exp_id || categoria) {
       obtenerLugaresRuta();
     } else {
       setLoading(false);
     }
-  }, [categoria]);
+  }, [exp_id, categoria]);
 
   useEffect(() => {
     if (lugares.length > 0) {
@@ -103,26 +113,36 @@ export default function NavegacionRuta() {
 
   const obtenerLugaresRuta = async () => {
     try {
-      const res = await API.get(
-        `/lugares?categoria=${encodeURIComponent(categoria || "")}`,
-      );
+      let res;
+
+      if (exp_id) {
+        res = await API.get(`/experiencias/${exp_id}/lugares`);
+      } else {
+        res = await API.get(
+          `/lugares?categoria=${encodeURIComponent(categoria || "")}`
+        );
+      }
 
       const data: Lugar[] = res.data;
 
       const lugaresOrdenados = [...data].sort((a, b) => {
-        const ordenA = a.orden_en_ruta ?? 0;
-        const ordenB = b.orden_en_ruta ?? 0;
+        const ordenA = a.orden_en_experiencia ?? a.orden_en_ruta ?? 0;
+        const ordenB = b.orden_en_experiencia ?? b.orden_en_ruta ?? 0;
         return ordenA - ordenB;
       });
 
       setLugares(lugaresOrdenados);
 
-      const indiceInicial = lugaresOrdenados.findIndex(
-        (item) => item.lug_id.toString() === id,
-      );
+      if (id) {
+        const indiceInicial = lugaresOrdenados.findIndex(
+          (item) => item.lug_id.toString() === id
+        );
 
-      if (indiceInicial >= 0) {
-        setIndiceActual(indiceInicial);
+        if (indiceInicial >= 0) {
+          setIndiceActual(indiceInicial);
+        }
+      } else {
+        setIndiceActual(0);
       }
     } catch (error) {
       console.log("Error cargando navegación de ruta:", error);
@@ -147,9 +167,13 @@ export default function NavegacionRuta() {
     const lugarActual = lugares[indiceActual];
 
     router.push({
-      pathname: "/detallesLugar",
-      params: { id: lugarActual.lug_id.toString() },
-    });
+  pathname: "/detallesLugar" as any,
+  params: {
+    id: lugarActual.lug_id.toString(),
+    exp_id: exp_id?.toString() || "",
+    nombre: nombre || "",
+  },
+});
   };
 
   if (loading) {
@@ -183,19 +207,14 @@ export default function NavegacionRuta() {
         <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => {
-              const lugarActual = lugares[indiceActual];
-
-              router.replace({
-                pathname: "/(tabs)/detallesLugar",
-                params: { id: lugarActual.lug_id.toString() },
-              });
-            }}
+            onPress={() => router.back()}
           >
             <Ionicons name="arrow-back" size={26} color="#000" />
           </TouchableOpacity>
 
-          <Text style={styles.titulo}>Ruta {categoria}</Text>
+          <Text style={styles.titulo}>
+            {nombre ? nombre : `Ruta ${categoria}`}
+          </Text>
         </View>
 
         <Text style={styles.progreso}>
@@ -219,6 +238,10 @@ export default function NavegacionRuta() {
             }}
             style={styles.imagen}
           />
+
+          {lugarActual.momento && (
+            <Text style={styles.momento}>{lugarActual.momento}</Text>
+          )}
 
           <Text style={styles.nombre}>{lugarActual.lug_nombre}</Text>
           <Text style={styles.descripcion}>{lugarActual.lug_descripcion}</Text>
@@ -281,11 +304,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   titulo: {
+    flex: 1,
     fontSize: 22,
     fontWeight: "bold",
     color: "#7B2CBF",
     marginTop: 20,
     marginBottom: 6,
+    marginLeft: 40,
   },
   progreso: {
     fontSize: 14,
@@ -304,6 +329,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#ddd",
     marginBottom: 10,
+  },
+  momento: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#7B2CBF",
+    marginBottom: 4,
   },
   nombre: {
     fontSize: 18,
@@ -346,20 +377,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 15,
   },
-
   backButton: {
     position: "absolute",
     top: -18,
     left: 2,
     zIndex: 10,
   },
-
   mapContainer: {
     height: 260,
     marginTop: 18,

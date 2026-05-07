@@ -18,6 +18,7 @@ const path = require("path");
 //transportes
 const transporteRoutes = require("./routes/transporteRoutes");
 
+const experienciasRoutes = require("./routes/experienciasRoutes");
 // importar rutas de usuarios
 const userRoutes = require("./routes/userRoutes");
 
@@ -33,6 +34,7 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 
 //importacion y uso de rutas de mapas
 const mapRoutes = require("./routes/mapRoutes");
+
 
 //temporal
 console.log("userRoutes:", typeof userRoutes);
@@ -59,6 +61,7 @@ app.use("/api", detalleLugarRoutes);
 
 app.use("/api", favoritoRoutes); //Favoritos
 //app.use("/api", detalleLugarRoutes);
+app.use("/api/experiencias", experienciasRoutes);
 
 // rutas de chatbot
 app.use("/api", chatbotRoutes);

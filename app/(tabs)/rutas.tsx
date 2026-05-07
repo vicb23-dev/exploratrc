@@ -42,8 +42,12 @@ export default function RutasScreen() {
             style={[styles.card, { backgroundColor: ruta.color }]}
             onPress={() => {
               if (ruta.nombre === "Ruta Gastronómica") {
-                router.push("/(tabs)/rutaGastronomica");
-              } else if (ruta.nombre === "Ruta Cultura") {
+              router.push({
+              pathname: "/experienciasRuta" as any,
+              params: { categoria: "Gastronomica" },
+               });
+                }
+              else if (ruta.nombre === "Ruta Cultura") {
                 router.push("/(tabs)/rutaCultura");
               } else if (ruta.nombre === "Ruta Entretenimiento") {
                 router.push("/(tabs)/rutaEntretenimiento" as any);
