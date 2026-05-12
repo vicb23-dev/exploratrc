@@ -42,7 +42,21 @@ export type MapWebViewRef = {
     placeLng: number;
     placeTitle: string;
   }) => void;
+
+//Por calles
+//RUta entre luagres 
+drawORSRoute: (data: {
+    coordinates: [number, number][];
+  }) => void;
+
+  //mi ubi -> lugar
+  drawUserORSRoute: (data: {
+  coordinates: [number, number][];
+}) => void;
+  
 };
+
+
 
 type Props = {
   initialLat: number;
@@ -130,6 +144,33 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
 
         injectMapJS(jsCode);
       },
+//POr calles 
+      drawORSRoute: ({ coordinates }) => {
+         const data = { coordinates };
+
+        const jsCode = `
+    if (window.drawORSRoute) {
+      window.drawORSRoute(${JSON.stringify( data )});
+    }
+    true;
+  `;
+
+  injectMapJS(jsCode);
+},
+
+// mi ubi -> ruta
+drawUserORSRoute: ({ coordinates }) => {
+  const data = { coordinates };
+
+  const jsCode = `
+    if (window.drawUserORSRoute) {
+      window.drawUserORSRoute(${JSON.stringify(data)});
+    }
+    true;
+  `;
+
+  injectMapJS(jsCode);
+},
     }));
 
     const html = `
@@ -155,29 +196,37 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
               margin: 0;
               padding: 0;
             }
+              /* BAJAR CONTROLES LEAFLET */
+                .leaflet-top {
+                  top: 20px !important;
+                }
+
+                .leaflet-control-zoom {
+                  margin-top: 20px !important;
+                }
 
             .marker-normal {
-              width: 18px;
-              height: 18px;
-              background: #2563eb;
+              width: 16px;
+              height: 16px;
+              background: #7B2CBF;
               border: 3px solid white;
               border-radius: 50%;
               box-shadow: 0 2px 8px rgba(0,0,0,0.35);
             }
 
             .marker-active {
-              width: 34px;
-              height: 34px;
-              background: #7B2CBF;
+              width: 30px;
+              height: 30px;
+              background: #2563eb;;
               border: 4px solid white;
               border-radius: 50%;
               box-shadow: 0 3px 12px rgba(0,0,0,0.45);
             }
 
             .marker-user {
-              width: 26px;
-              height: 26px;
-              background: #00b4d8;
+              width: 18px;
+              height: 18px;
+              background: #00d8c2;
               border: 4px solid white;
               border-radius: 50%;
               box-shadow: 0 3px 10px rgba(0,0,0,0.35);
@@ -202,6 +251,8 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
             var routeMarkers = [];
             var userMarker = null;
             var placeMarker = null;
+            var orsRouteLine = null; //por calles  
+            var userORSRouteLine = null;
 
             var blueIcon = L.icon({
               iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -260,6 +311,8 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
                 userToActiveLine = null;
               }
 
+              
+
               if (userMarker) {
                 map.removeLayer(userMarker);
                 userMarker = null;
@@ -270,6 +323,64 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
                 placeMarker = null;
               }
             }
+
+
+            // POR CALLES
+              window.drawORSRoute = function(data) {
+                if (!data || !data.coordinates || data.coordinates.length === 0) {
+                  return;
+                }
+
+                if (orsRouteLine) {
+                  map.removeLayer(orsRouteLine);
+                  orsRouteLine = null;
+                }
+
+                var routeCoords = data.coordinates.map(function(coord) {
+                  return [coord[1], coord[0]];
+                });
+
+                orsRouteLine = L.polyline(routeCoords, {
+                  color: "#00b4d8",
+                  weight: 7,
+                  opacity: 0.95
+                }).addTo(map);
+
+                map.fitBounds(orsRouteLine.getBounds(), {
+                  padding: [45, 45]
+                });
+              };
+
+              //PARA mi ubicacion -> luagar de la ruta
+
+              window.drawUserORSRoute = function(data) {
+                if (!data || !data.coordinates || data.coordinates.length === 0) {
+                  return;
+                }
+
+                if (userORSRouteLine) {
+                  map.removeLayer(userORSRouteLine);
+                  userORSRouteLine = null;
+                }
+
+                var routeCoords = data.coordinates.map(function(coord) {
+                  return [coord[1], coord[0]];
+                });
+
+                userORSRouteLine = L.polyline(routeCoords, {
+                  color: "#d8003dd1",
+                  weight: 5,
+                  opacity: 0.95,
+                  dashArray: "10, 10"
+                }).addTo(map);
+
+                map.fitBounds(userORSRouteLine.getBounds(), {
+                  padding: [45, 45]
+                });
+              };
+                          
+
+
 
             window.setSingleMarker = function(data) {
               limpiarMapa();
@@ -283,6 +394,8 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
 
               map.setView([data.lat, data.lng], 16);
             };
+
+            
 
             window.drawUserToPlace = function(data) {
               limpiarMapa();
@@ -334,11 +447,11 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
                 return [marker.lat, marker.lng];
               });
 
-              routeLine = L.polyline(path, {
-                color: "#7B2CBF",
-                weight: 5,
-                opacity: 0.95
-              }).addTo(map);
+              // routeLine = L.polyline(path, {
+              //   color: "#7B2CBF",
+              //   weight: 5,
+              //   opacity: 0.95
+              // }).addTo(map);
 
               data.markers.forEach(function(item, index) {
                 var isActive = index === data.activeIndex;
@@ -365,19 +478,19 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
                   .bindPopup("Mi ubicación");
 
                 if (active) {
-                  userToActiveLine = L.polyline(
-                    [
-                      [data.userLocation.lat, data.userLocation.lng],
-                      [active.lat, active.lng]
-                    ],
-                    {
-                      color: "#00b4d8",
-                      weight: 4,
-                      opacity: 0.9,
-                      dashArray: "8, 8"
-                    }
-                  ).addTo(map);
-                }
+                //   userToActiveLine = L.polyline(
+                //     [
+                //       [data.userLocation.lat, data.userLocation.lng],
+                //       [active.lat, active.lng]
+                //     ],
+                //     {
+                //       color: "#00b4d8",
+                //       weight: 4,
+                //       opacity: 0.9,
+                //       dashArray: "8, 8"
+                //     }
+                //   ).addTo(map);
+                 }
               }
 
               var groupLayers = [];
@@ -394,9 +507,13 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
                 groupLayers.push(userMarker);
               }
 
-              if (userToActiveLine) {
-                groupLayers.push(userToActiveLine);
-              }
+              // if (userToActiveLine) {
+              //   groupLayers.push(userToActiveLine);
+              // }
+
+                        if (orsRouteLine) {
+            groupLayers.push(orsRouteLine);
+          }
 
               if (groupLayers.length > 0) {
                 var group = L.featureGroup(groupLayers);

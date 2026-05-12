@@ -1,6 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function RutasScreen() {
   const rutas = [
@@ -8,61 +8,64 @@ export default function RutasScreen() {
       nombre: "Ruta Gastronómica",
       imagen: require("../../assets/images/rutas/gastronomica.png"),
       color: "#FF5A1F",
+      path: "/(tabs)/rutaGastronomica",
     },
     {
       nombre: "Ruta Cultura",
       imagen: require("../../assets/images/rutas/cultura.png"),
       color: "#7B2CBF",
+      path: "/(tabs)/rutaCultura",
     },
     {
       nombre: "Ruta Entretenimiento",
       imagen: require("../../assets/images/rutas/entretenimiento.png"),
       color: "#FFC300",
+      path: "/(tabs)/rutaEntretenimiento",
     },
     {
       nombre: "Ruta Night",
       imagen: require("../../assets/images/rutas/night.png"),
       color: "#00B4D8",
+      path: "/(tabs)/rutaNight",
     },
     {
       nombre: "Ruta Familiar",
       imagen: require("../../assets/images/rutas/familiar.png"),
       color: "#38B000",
+      path: "/(tabs)/rutaFamiliar",
     },
   ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Rutas TRC</Text>
-
-      <View style={styles.grid}>
-        {rutas.map((ruta, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[styles.card, { backgroundColor: ruta.color }]}
-            onPress={() => {
-              if (ruta.nombre === "Ruta Gastronómica") {
-              router.push({
-              pathname: "/experienciasRuta" as any,
-              params: { categoria: "Gastronomica" },
-               });
-                }
-              else if (ruta.nombre === "Ruta Cultura") {
-                router.push("/(tabs)/rutaCultura");
-              } else if (ruta.nombre === "Ruta Entretenimiento") {
-                router.push("/(tabs)/rutaEntretenimiento" as any);
-              } else if (ruta.nombre === "Ruta Night") {
-                router.push("/(tabs)/rutaNight");
-              } else if (ruta.nombre === "Ruta Familiar") {
-                router.push("/(tabs)/rutaFamiliar");
-              }
-            }}
-          >
-            <Image source={ruta.imagen} style={styles.imagen} />
-            <Text style={styles.texto}>{ruta.nombre}</Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.topBar}>
+        <Text style={styles.titulo}>Rutas TRC</Text>
+        <Text style={styles.subtitulo}>Elige una experiencia para explorar Torreón</Text>
       </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
+          {rutas.map((ruta, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.card, { backgroundColor: ruta.color }]}
+              activeOpacity={0.85}
+              onPress={() => router.push(ruta.path as any)}
+            >
+              <View style={styles.iconContainer}>
+                <Image source={ruta.imagen} style={styles.imagen} />
+              </View>
+
+              <Text style={styles.texto}>{ruta.nombre}</Text>
+
+              <View style={styles.footer}>
+                <Text style={styles.verTexto}>Ver ruta</Text>
+                <Ionicons name="arrow-forward" size={17} color="#fff" />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -70,14 +73,31 @@ export default function RutasScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 50,
-    paddingHorizontal: 20,
+    backgroundColor: "#F7F7F7",
+  },
+  topBar: {
+    backgroundColor: "#07769b",
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingHorizontal: 22,
+    //borderBottomLeftRadius: 30,
+    //borderBottomRightRadius: 30,
+    
   },
   titulo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: 30,
+    fontWeight: "900",
+    color: "#fff",
+    paddingVertical: 18
+  },
+  subtitulo: {
+    fontSize: 15,
+    color: "#ddd",
+    marginTop: -10,
+  },
+  content: {
+    padding: 12,
+    paddingBottom: 40,
   },
   grid: {
     flexDirection: "row",
@@ -86,22 +106,43 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "48%",
-    height: 140,
-    borderRadius: 15,
-    alignItems: "center",
+    minHeight: 180,
+    borderRadius: 26,
+    padding: 12,
+    marginBottom: 16,
+    justifyContent: "space-between",
+    elevation: 5,
+  },
+  iconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.25)",
     justifyContent: "center",
-    marginBottom: 15,
+    alignItems: "center",
+    marginBottom: 12,
+     //alignSelf: "center",
   },
   imagen: {
-    width: 60,
-    height: 60,
-    marginBottom: 10,
+    width: 52,
+    height: 52,
     resizeMode: "contain",
   },
   texto: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#fff",
+    lineHeight: 25,
+  },
+  footer: {
+    marginTop: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  verTexto: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#fff",
   },
 });

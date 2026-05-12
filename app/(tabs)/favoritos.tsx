@@ -63,9 +63,12 @@ export default function Favoritos() {
 
   const irADetalle = (id: number) => {
     router.push({
-      pathname: "/detallesLugar",
-      params: { id: id.toString() },
-    });
+  pathname: "/detallesLugar",
+  params: {
+    id: id.toString(),
+    origen: "favoritos",
+  },
+});
   };
 
   const renderItem = ({ item }: { item: Lugar }) => (
@@ -103,38 +106,61 @@ export default function Favoritos() {
     </TouchableOpacity>
   );
 
-  return (
+    return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Mis favoritos</Text>
+      <View style={styles.topBar}>
+        <Ionicons name="heart" size={28} color="#fff" />
+        <Text style={styles.titulo}>Mis favoritos</Text>
+      </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#7B2CBF" style={styles.loader} />
-      ) : favoritos.length === 0 ? (
-        <Text style={styles.vacio}>No tienes lugares favoritos todavía.</Text>
-      ) : (
-        <FlatList
-          data={favoritos}
-          keyExtractor={(item) => item.lug_id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.lista}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      <View style={styles.content}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#7B2CBF" style={styles.loader} />
+        ) : favoritos.length === 0 ? (
+          <Text style={styles.vacio}>No tienes lugares favoritos todavía.</Text>
+        ) : (
+          <FlatList
+            data={favoritos}
+            keyExtractor={(item) => item.lug_id.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={styles.lista}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </View>
     </View>
-  );
+);
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 15,
+    //padding: 15,
   },
+  topBar: {
+  backgroundColor: "#ff1a1a",
+  paddingTop: 40,
+  paddingBottom: 24,
+  paddingHorizontal: 22,
+ // borderBottomLeftRadius: 30,
+ // borderBottomRightRadius: 30,
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 13,
+  elevation: 6,
+},
+
+content: {
+  flex: 1,
+  padding: 15,
+},
+
   titulo: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 15,
-    color: "#000",
+    marginBottom: -2,
+    color: "#ffffff",
   },
   loader: {
     marginTop: 30,

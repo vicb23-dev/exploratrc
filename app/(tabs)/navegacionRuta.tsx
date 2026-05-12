@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ORS_API_KEY } from "../../config/keys";
 import API from "../../services/api";
 import MapWebView, { MapWebViewRef } from "../componentes/MapWebView";
 
@@ -35,17 +36,34 @@ type Ubicacion = {
 export default function NavegacionRuta() {
   const params = useLocalSearchParams();
 
-  const categoria = Array.isArray(params.categoria)
-    ? params.categoria[0]
-    : params.categoria;
+  // const categoria = Array.isArray(params.categoria)
+  //   ? params.categoria[0]
+  //   : params.categoria;
 
-  const exp_id = Array.isArray(params.exp_id)
-    ? params.exp_id[0]
-    : params.exp_id;
+  const categoriaParam = Array.isArray(params.categoria)
+  ? params.categoria[0]
+  : params.categoria;
+
+const categoria =
+  categoriaParam && categoriaParam.trim() !== "" ? categoriaParam : null;
+
+  // const exp_id = Array.isArray(params.exp_id)
+  //   ? params.exp_id[0]
+  //   : params.exp_id;
+
+  const exp_idParam = Array.isArray(params.exp_id)
+  ? params.exp_id[0]
+  : params.exp_id;
+
+const exp_id = exp_idParam && exp_idParam.trim() !== "" ? exp_idParam : null;
 
   const nombre = Array.isArray(params.nombre)
     ? params.nombre[0]
     : params.nombre;
+
+    const origen = Array.isArray(params.origen)
+  ? params.origen[0]
+  : params.origen;
 
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -55,6 +73,10 @@ export default function NavegacionRuta() {
   const [miUbicacion, setMiUbicacion] = useState<Ubicacion | null>(null);
 
   const mapRef = useRef<MapWebViewRef>(null);
+
+  
+
+  
 
   useEffect(() => {
     obtenerMiUbicacion();
@@ -88,6 +110,66 @@ export default function NavegacionRuta() {
       }, 500);
     }
   }, [lugares, indiceActual, miUbicacion]);
+
+
+ 
+
+//por calles 
+//   useEffect(() => {
+//   if (miUbicacion && lugares.length > 0) {
+//     setTimeout(() => {
+//       obtenerRutaEntreLugaresORS();
+//     }, 1000);
+//   }
+// }, [miUbicacion, indiceActual, lugares]);
+
+useEffect(() => {
+  if (lugares.length > 0) {
+    const markers = lugares.map((lugar) => ({
+      id: lugar.lug_id,
+      lat: Number(lugar.lug_latitud),
+      lng: Number(lugar.lug_longitud),
+      title: lugar.lug_nombre,
+    }));
+
+    setTimeout(() => {
+      if (!markers.length) return;
+
+      mapRef.current?.setRouteMarkers({
+        markers,
+        activeIndex: indiceActual,
+        userLocation: miUbicacion ?? null,
+      });
+
+      setTimeout(() => {
+        obtenerRutaEntreLugaresORS();
+
+        if (miUbicacion) {
+          obtenerRutaUsuarioAlLugarORS();
+        }
+      }, 400);
+    }, 500);
+  }
+}, [lugares, indiceActual, miUbicacion]);
+
+// RUTA ENTRE TODOS LOS LUGARES
+// useEffect(() => {
+//   if (lugares.length > 1) {
+//     setTimeout(() => {
+//       obtenerRutaEntreLugaresORS();
+//     }, 1000);
+//   }
+// }, [lugares.length]);
+
+
+// // MI UBICACIÓN → LUGAR ACTUAL
+// useEffect(() => {
+//   if (miUbicacion && lugares.length > 0) {
+//     setTimeout(() => {
+//       obtenerRutaUsuarioAlLugarORS();
+//     }, 1000);
+//   }
+// }, [miUbicacion, indiceActual]);
 
   const obtenerMiUbicacion = async () => {
     try {
@@ -151,6 +233,85 @@ export default function NavegacionRuta() {
     }
   };
 
+
+//POR CALLES
+const obtenerRutaEntreLugaresORS = async () => {
+  try {
+    if (lugares.length < 2) return;
+
+    const res = await fetch(
+      "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+      {
+        method: "POST",
+        headers: {
+          Authorization: ORS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          coordinates: lugares.map((lugar) => [
+            Number(lugar.lug_longitud),
+            Number(lugar.lug_latitud),
+          ]),
+        }),
+      }
+    );
+
+    const data = await res.json();
+    const coordinates = data.features?.[0]?.geometry?.coordinates || [];
+
+    console.log("RUTA ENTRE LUGARES:", coordinates.length);
+
+    mapRef.current?.drawORSRoute({
+      coordinates,
+    });
+  } catch (error) {
+    console.log("Error ruta entre lugares:", error);
+  }
+};
+
+const obtenerRutaUsuarioAlLugarORS = async () => {
+  try {
+    if (!miUbicacion || lugares.length === 0) return;
+
+    const lugarActual = lugares[indiceActual];
+
+    const res = await fetch(
+      "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+      {
+        method: "POST",
+        headers: {
+          Authorization: ORS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          coordinates: [
+            [miUbicacion.lng, miUbicacion.lat],
+            [
+              Number(lugarActual.lug_longitud),
+              Number(lugarActual.lug_latitud),
+            ],
+          ],
+        }),
+      }
+    );
+
+    const data = await res.json();
+    const coordinates = data.features?.[0]?.geometry?.coordinates || [];
+
+    mapRef.current?.drawUserORSRoute({
+      coordinates,
+    });
+  } catch (error) {
+    console.log("Error ruta usuario-lugar:", error);
+  }
+};
+
+
+
+
+
+
+
   const siguienteLugar = () => {
     if (indiceActual < lugares.length - 1) {
       setIndiceActual(indiceActual + 1);
@@ -204,7 +365,8 @@ export default function NavegacionRuta() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
+
+        {/* <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
@@ -215,7 +377,25 @@ export default function NavegacionRuta() {
           <Text style={styles.titulo}>
             {nombre ? nombre : `Ruta ${categoria}`}
           </Text>
-        </View>
+        </View> */}
+
+        <View style={styles.header}>
+  <TouchableOpacity
+    style={styles.backButton}
+    // onPress={() => router.back()}
+    onPress={() => router.replace((origen as any) || "/(tabs)/rutas")}
+  >
+    <Ionicons name="arrow-back" size={24} color="#fff" />
+  </TouchableOpacity>
+
+  <Text style={styles.titulo}>
+    {nombre ? nombre : `Ruta ${categoria}`}
+  </Text>
+</View>
+
+        
+
+
 
         <Text style={styles.progreso}>
           Punto {indiceActual + 1} de {lugares.length}
@@ -304,18 +484,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   titulo: {
-    flex: 1,
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#7B2CBF",
-    marginTop: 20,
-    marginBottom: 6,
-    marginLeft: 40,
-  },
+  flex: 1,
+  fontSize: 23,
+  fontWeight: "900",
+  color: "#fff",
+},
   progreso: {
     fontSize: 14,
     color: "#555",
-    marginBottom: 10,
+    marginTop: 10,
+    marginBottom: 5,
+    marginHorizontal: 5,
   },
   card: {
     marginTop: 12,
@@ -377,17 +556,43 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 15,
-  },
+  // headerRow: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   marginTop: 15,
+  // },
+
+    header: {
+  backgroundColor: "#7B2CBF",
+  paddingTop: 15,
+  paddingBottom: 24,
+  paddingHorizontal: 15,
+  // borderBottomLeftRadius: 0,
+  // borderBottomRightRadius: 0,
+  flexDirection: "row",
+  alignItems: "center",
+  elevation: 6,
+  marginHorizontal: -18,
+},
+  // backButton: {
+  //   position: "absolute",
+  //   top: -18,
+  //   left: 2,
+  //   zIndex: 10,
+  // },
+
   backButton: {
-    position: "absolute",
-    top: -18,
-    left: 2,
-    zIndex: 10,
-  },
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: "rgba(255,255,255,0.18)",
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: 14,
+},
+
+
+
   mapContainer: {
     height: 260,
     marginTop: 18,

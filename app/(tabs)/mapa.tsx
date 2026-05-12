@@ -171,9 +171,9 @@ const styles = StyleSheet.create({
 
   searchContainer: {
     position: "absolute",
-    top: 15,
-    left: 70,
-    right: 20,
+    top: 40,
+    left: 60,
+    right: 15,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",

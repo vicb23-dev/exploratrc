@@ -32,6 +32,8 @@ type Transporte = {
   tp_descripcion: string;
 };
 
+
+  
 function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -52,8 +54,15 @@ function calcularTiempo(distancia: number, velocidad: number) {
 }
 
 export default function DetallesLugar() {
-  const { id, exp_id, nombre } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+
+const { id, exp_id, nombre } = params;
   const router = useRouter();
+//params 
+  const origen = Array.isArray(params.origen)
+    ? params.origen[0]
+    : params.origen;
+  
 
   const idTexto = Array.isArray(id) ? id[0] : id;
   const expIdTexto = Array.isArray(exp_id) ? exp_id[0] : exp_id;
@@ -64,6 +73,8 @@ export default function DetallesLugar() {
   const [transportes, setTransportes] = useState<Transporte[]>([]);
   const [esFavorito, setEsFavorito] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  
 
   useEffect(() => {
     obtenerUbicacionUsuario();
@@ -150,31 +161,45 @@ export default function DetallesLugar() {
   };
 
   const regresar = () => {
-    if (expIdTexto) {
-      router.replace({
-        pathname: "/(tabs)/navegacionRuta" as any,
-        params: {
-          exp_id: expIdTexto,
-          nombre: nombreTexto || "",
-        },
-      });
-      return;
-    }
 
-    if (lugar?.categoria === "Cultura") {
-      router.replace("/(tabs)/rutaCultura");
-    } else if (lugar?.categoria === "Gastronomica") {
-      router.replace("/experienciasRuta" as any);
-    } else if (lugar?.categoria === "Entretenimiento") {
-      router.replace("/(tabs)/rutaEntretenimiento");
-    } else if (lugar?.categoria === "Night") {
-      router.replace("/(tabs)/rutaNight");
-    } else if (lugar?.categoria === "Familiar") {
-      router.replace("/(tabs)/rutaFamiliar");
-    } else {
-      router.replace("/(tabs)/rutas");
-    }
-  };
+  // SI VIENE DE FAVORITOS
+  if (origen === "favoritos") {
+    router.replace("/(tabs)/favoritos");
+    return;
+  }
+
+  // SI VIENE DE EXPERIENCIA
+  if (expIdTexto) {
+    router.replace({
+      pathname: "/(tabs)/navegacionRuta" as any,
+      params: {
+        exp_id: expIdTexto,
+        nombre: nombreTexto || "",
+      },
+    });
+    return;
+  }
+
+  // SEGÚN CATEGORÍA
+  if (lugar?.categoria === "Cultura") {
+    router.replace("/(tabs)/rutaCultura");
+
+  } else if (lugar?.categoria === "Gastronomica") {
+    router.replace("/rutaGastronomica" as any);
+
+  } else if (lugar?.categoria === "Entretenimiento") {
+    router.replace("/(tabs)/rutaEntretenimiento");
+
+  } else if (lugar?.categoria === "Night") {
+    router.replace("/(tabs)/rutaNight");
+
+  } else if (lugar?.categoria === "Familiar") {
+    router.replace("/(tabs)/rutaFamiliar");
+
+  } else {
+    router.replace("/(tabs)/rutas");
+  }
+};
 
   if (loading) {
     return (
@@ -324,10 +349,11 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.95)",
+    backgroundColor: "rgba(255, 255, 255, 0.69)",
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
+    marginVertical:  15
   },
   content: {
     padding: 20,
@@ -461,13 +487,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 28,
     alignItems: "center",
-    marginTop: 12,
+    marginTop: 15,
     flexDirection: "row",
     justifyContent: "center",
     gap: 8,
   },
   btnText: {
-    color: "#FFFFFF",
+    color: "#ffffff",
     fontSize: 20,
     fontWeight: "900",
   },
