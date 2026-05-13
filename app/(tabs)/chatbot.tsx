@@ -6,21 +6,22 @@
  * presupuesto y tiempo disponible para recomendar una ruta.
  */
 
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
-    FlatList,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import API from "../services/api";
+import API from "../../services/api";
 
 type Mensaje = {
   id: string;
@@ -96,8 +97,15 @@ export default function Chatbot() {
         <View style={styles.content}>
           {/* Encabezado de la pantalla */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.back}>←</Text>
+
+          
+
+
+            <TouchableOpacity 
+             style={styles.back}
+             onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+             
             </TouchableOpacity>
 
             <Text style={styles.title}>Asistente de rutas</Text>
@@ -172,14 +180,22 @@ const styles = StyleSheet.create({
 
   // Flecha para regresar
   back: {
-    fontSize: 30,
-    color: "#fff",
-    marginRight: 15,
+    // fontSize: 30,
+    // color: "#fff",
+    
+
+     width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: "rgba(255,255,255,0.18)",
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: 15,
   },
 
   // Título de pantalla
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
     color: "#fff",
   },

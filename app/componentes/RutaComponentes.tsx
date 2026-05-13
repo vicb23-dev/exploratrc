@@ -12,11 +12,10 @@ import {
 } from "react-native";
 import API from "../../services/api";
 
-type Lugar = {
-  lug_id: number;
-  lug_nombre: string;
-  lug_descripcion: string;
-  imagen_principal_url: string | null;
+type Experiencia = {
+  exp_id: number;
+  exp_nombre: string;
+  exp_descripcion: string;
 };
 
 type Props = {
@@ -27,118 +26,117 @@ type Props = {
   loaderColor: string;
 };
 
-export default function RutaLugares({
+export default function RutaComponentes({
   categoria,
   titulo,
   headerColor,
   cardColor,
   loaderColor,
 }: Props) {
-  const [lugares, setLugares] = useState<Lugar[]>([]);
-  const [favoritos, setFavoritos] = useState<number[]>([]);
+  const [experiencias, setExperiencias] = useState<Experiencia[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const usu_id = 1;
-
   useEffect(() => {
-    cargarDatos();
+    cargarExperiencias();
   }, []);
 
-  const cargarDatos = async () => {
+  const cargarExperiencias = async () => {
     try {
-      const lugaresRes = await API.get(`/lugares?categoria=${categoria}`);
-      setLugares(lugaresRes.data);
+      const res = await API.get(
+        `/experiencias?categoria=${categoria}`
+      );
 
-      try {
-        const favoritosRes = await API.get(`/favoritos/${usu_id}`);
-        setFavoritos(favoritosRes.data.map((lugar: Lugar) => lugar.lug_id));
-      } catch (error) {
-        console.log("Error al cargar favoritos:", error);
-        setFavoritos([]);
-      }
+      setExperiencias(res.data);
     } catch (error) {
-      console.log("Error al cargar lugares:", error);
+      console.log("Error experiencias:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const irADetalle = (id: number) => {
+  const irARuta = (exp_id: number, nombre: string) => {
     router.push({
-      pathname: "/detallesLugar",
-      params: { id: id.toString() },
+      pathname: "/(tabs)/navegacionRuta" as any,
+      params: {
+        exp_id: exp_id.toString(),
+        nombre,
+         origen:
+        categoria === "Gastronomica"
+          ? "/(tabs)/rutaGastronomica"
+          : categoria === "Cultura"
+          ? "/(tabs)/rutaCultura"
+          : categoria === "Entretenimiento"
+          ? "/(tabs)/rutaEntretenimiento"
+          : categoria === "Night"
+          ? "/(tabs)/rutaNight"
+          : categoria === "Familiar"
+          ? "/(tabs)/rutaFamiliar"
+          : "/(tabs)/rutas",
+      },
     });
   };
 
-  const cambiarFavorito = async (lug_id: number) => {
-    const yaEsFavorito = favoritos.includes(lug_id);
+  const renderItem = ({ item }: { item: Experiencia }) => (
+  <TouchableOpacity
+    style={[styles.card, { backgroundColor: cardColor }]}
+    activeOpacity={0.88}
+    onPress={() => irARuta(item.exp_id, item.exp_nombre)}
+  >
+    <View
+      style={{
+        width: 55,
+        height: 6,
+        backgroundColor: "rgba(255,255,255,0.4)",
+        borderRadius: 20,
+        marginBottom: 15,
+      }}
+    />
 
-    try {
-      if (yaEsFavorito) {
-        await API.delete(`/favoritos/${usu_id}/${lug_id}`);
-        setFavoritos(favoritos.filter((id) => id !== lug_id));
-      } else {
-        await API.post("/favoritos", {
-          usu_id,
-          lug_id,
-        });
-        setFavoritos([...favoritos, lug_id]);
-      }
-    } catch (error) {
-      console.log("Error al cambiar favorito:", error);
-    }
-  };
+    <Text style={styles.nombre}>
+      {item.exp_nombre}
+    </Text>
 
-  const renderItem = ({ item }: { item: Lugar }) => {
-    const yaEsFavorito = favoritos.includes(item.lug_id);
+    <Text style={styles.descripcion}>
+      {item.exp_descripcion}
+    </Text>
 
-    return (
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: cardColor }]}
-        activeOpacity={0.8}
-        onPress={() => irADetalle(item.lug_id)}
+    <View
+      style={{
+        marginTop: 15,
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+    >
+      <Text
+        style={{
+          color: "#fff",
+          fontWeight: "700",
+          fontSize: 14,
+          marginRight: 4,
+        }}
       >
-        <View style={styles.info}>
-          <Text style={styles.nombre}>{item.lug_nombre}</Text>
-          <Text style={styles.descripcion}>{item.lug_descripcion}</Text>
-        </View>
+        Ver recorrido
+      </Text>
 
-        <View style={styles.right}>
-          <Image
-            source={{
-              uri: item.imagen_principal_url || "https://via.placeholder.com/100",
-            }}
-            style={styles.imagen}
-          />
+      <Ionicons
+        name="arrow-forward"
+        size={18}
+        color="#fff"
+      />
+    </View>
+  </TouchableOpacity>
+);
 
-          <TouchableOpacity
-            style={styles.botonCorazon}
-            onPress={(e) => {
-              e.stopPropagation();
-              cambiarFavorito(item.lug_id);
-            }}
-          >
-            <Ionicons
-              name={yaEsFavorito ? "heart" : "heart-outline"}
-              size={24}
-              color="red"
-            />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  return (
+return (
   <View style={styles.container}>
-    {/* Flecha de regreso */}
 
+    {/* LOGO + FLECHA */}
     <View style={styles.logoContainer}>
       <TouchableOpacity
         style={styles.backButtonTop}
         onPress={() => router.replace("/(tabs)/rutas")}
       >
-        <Ionicons name="arrow-back" size={24} color="#000" />
+        <Ionicons name="arrow-back" size={28} color="#000" />
       </TouchableOpacity>
 
       <Image
@@ -148,101 +146,124 @@ export default function RutaLugares({
       />
     </View>
 
+    {/* HEADER */}
     <View style={[styles.header, { backgroundColor: headerColor }]}>
-      <Text style={styles.titulo}>{titulo}</Text>
+      <Text style={styles.titulo}>
+        {titulo}
+      </Text>
     </View>
 
+    {/* CONTENIDO */}
+    {loading ? (
+      <ActivityIndicator
+        size="large"
+        color={loaderColor}
+        style={styles.loader}
+      />
+    ) : (
+      <FlatList
+        data={experiencias}
+        keyExtractor={(item) => item.exp_id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.lista}
+        showsVerticalScrollIndicator={false}
+      />
+    )}
+  </View>
+);
 
 
 
-
-      {loading ? (
-        <ActivityIndicator size="large" color={loaderColor} style={styles.loader} />
-      ) : (
-        <FlatList
-          data={lugares}
-          keyExtractor={(item) => item.lug_id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.lista}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffff",//"#F7F7F7",
   },
+
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -20,
+    marginTop: 5,
+    backgroundColor: "transparent",
   },
+
   logo: {
     width: "20%",
     height: 120,
-  },
-  header: {
-    paddingVertical: 20,
-    paddingHorizontal: 15,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -30,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  loader: {
-    marginTop: 20,
-  },
-  lista: {
-    padding: 10,
-  },
-  card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    borderRadius: 15,
-    marginBottom: 10,
-  },
-  info: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  nombre: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 5,
-    color: "#000",
-  },
-  descripcion: {
-    fontSize: 13,
-    color: "#555",
-  },
-  right: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  imagen: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    backgroundColor: "#ddd",
-  },
-  botonCorazon: {
-    marginLeft: 10,
+    backgroundColor: "transparent",
   },
 
-backButtonTop: {
-  position: "absolute",
-  left: 15,
-  top: 40,
-  zIndex: 10,
-},
+  backButtonTop: {
+    position: "absolute",
+    left: 18,
+    top: 40,
+    zIndex: 10,
+    backgroundColor: "#ffffffb4",
+    padding: 8,
+    borderRadius: 50,
+    elevation: 4,
+  },
+
+  header: {
+    paddingVertical: 22,
+    paddingHorizontal: 22,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    marginTop: -25,
+    elevation: 5,
+  },
+
+  titulo: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#fff",
+    letterSpacing: 0.5,
+  },
+
+  loader: {
+    marginTop: 40,
+  },
+
+  lista: {
+    paddingHorizontal: 18,
+    paddingTop: 20,
+    paddingBottom: 45,
+  },
+
+  card: {
+    borderRadius: 26,
+    padding: 22,
+    marginBottom: 18,
+    elevation: 5,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+  },
+
+  nombre: {
+    fontSize: 21,
+    fontWeight: "900",
+    color: "#fff",
+    marginBottom: 5,
+    lineHeight: 28,
+  },
+
+  descripcion: {
+    fontSize: 13,
+    color: "#fff",
+    lineHeight: 20,
+    opacity: 0.95,
+  },
+
+  
+
+
 });
+//ver recorrido

@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+    
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
@@ -60,9 +61,13 @@ export default function TabLayout() {
       <Tabs.Screen name="rutaFamiliar" options={{ href: null }} />
       <Tabs.Screen name="rutaGastronomica" options={{ href: null }} />
       <Tabs.Screen name="rutaNight" options={{ href: null }} />
+       <Tabs.Screen name="chatbot" options={{ href: null }} />
+      
       
     </Tabs>
+    
   );
+  
 
 
  

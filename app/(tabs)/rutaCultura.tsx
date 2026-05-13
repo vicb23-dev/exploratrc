@@ -4,7 +4,7 @@ export default function RutaCultura() {
   return (
     <RutaLugares
       categoria="Cultura"
-      titulo="Ruta Cultural"
+      titulo="Experiencias Culturales"
       headerColor="#7B2CBF"
       cardColor="#7a2cbf23"
       loaderColor="#7B2CBF"

@@ -4,9 +4,9 @@ export default function RutaGastronomica() {
   return (
     <RutaLugares
       categoria="Gastronomica"
-      titulo="Ruta Gastronómica"
+      titulo="Experiencias Gastronomicas"
       headerColor="#FF5A1F"
-      cardColor="#FFF3EE"
+      cardColor="#fcae8d"
       loaderColor="#FF5A1F"
     />
   );
