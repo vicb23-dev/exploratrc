@@ -258,7 +258,20 @@ const { id, exp_id, nombre } = params;
             <Text style={styles.transportSubtitle}>
               Rutas de transporte público cercanas a este destino
             </Text>
-
+{lugar.categoria === "Night" && (
+  <Text
+    style={{
+      fontSize: 13,
+      color: "#FF6B00",
+      marginBottom: 12,
+      fontWeight: "700",
+      lineHeight: 20,
+    }}
+  >
+    ⚠ Algunas rutas de transporte público pueden dejar de pasar por la noche.
+    Verifica horarios antes de salir.
+  </Text>
+)}
             {transportes.length === 0 ? (
               <Text style={styles.noTransportText}>No hay transporte disponible</Text>
             ) : (

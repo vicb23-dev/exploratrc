@@ -76,7 +76,7 @@ export default function RutaComponentes({
     });
   };
 
-  const renderItem = ({ item }: { item: Experiencia }) => (
+ const renderItem = ({ item }: { item: Experiencia }) => (
   <TouchableOpacity
     style={[styles.card, { backgroundColor: cardColor }]}
     activeOpacity={0.88}

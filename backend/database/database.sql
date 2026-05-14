@@ -32,6 +32,42 @@ CREATE TABLE lugares_rutas (
     PRIMARY KEY (lug_id, rut_id)                                 -- Llave primaria compuesta [cite: 430]
 );
 
+-- ==========================================
+-- EXPERIENCIAS DENTRO DE CADA RUTA
+-- ==========================================
+
+CREATE TABLE experiencias_rutas (
+    exp_id SERIAL PRIMARY KEY,
+    rut_id INTEGER NOT NULL,
+    exp_nombre VARCHAR(100) NOT NULL,
+    exp_descripcion TEXT,
+    exp_imagen_url VARCHAR(255),
+
+    FOREIGN KEY (rut_id)
+    REFERENCES rutas(rut_id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE experiencias_lugares (
+    id SERIAL PRIMARY KEY,
+    exp_id INTEGER NOT NULL,
+    lug_id INTEGER NOT NULL,
+    momento VARCHAR(50) NOT NULL,
+    orden_en_experiencia INTEGER NOT NULL,
+
+    FOREIGN KEY (exp_id)
+    REFERENCES experiencias_rutas(exp_id)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (lug_id)
+    REFERENCES lugares(lug_id)
+    ON DELETE CASCADE,
+
+    UNIQUE (exp_id, lug_id)
+);
+
+SELECT * FROM experiencias_rutas;
+SELECT * FROM experiencias_lugares;
 
 INSERT INTO rutas (rut_nombre, rut_descripcion, rut_color) VALUES 
 ('Gastronomica', 'Ruta de sabores típicos de la región de Torreón.', '#FFA500'), -- [cite: 89, 189]
@@ -43,6 +79,155 @@ INSERT INTO rutas (rut_nombre, rut_descripcion, rut_color) VALUES
 ('Entretenimiento', 'Ruta de diversion en lugares para todo el publico.', '#29dbff');
 
 
+INSERT INTO experiencias_rutas (rut_id, exp_nombre, exp_descripcion)
+VALUES
+(
+ (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Gastronomica'),
+ 'Día gastronómico clásico',
+ 'Recorrido completo desde desayuno hasta cena con lugares representativos.'
+),
+(
+ (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Gastronomica'),
+ 'Plan dulce y café',
+ 'Experiencia enfocada en cafeterías, postres y lugares tranquilos.'
+),
+(
+ (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Gastronomica'),
+ 'Ruta familiar',
+ 'Lugares cómodos y accesibles para disfrutar en familia durante todo el día.'
+),
+(
+ (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Gastronomica'),
+ 'Antojitos laguneros',
+ 'Ruta de comida casual, tacos y sabores típicos de la región.'
+),
+(
+ (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Gastronomica'),
+ 'Cena y convivencia',
+ 'Experiencia pensada para tarde-noche con cena y ambiente social.'
+);
+
+INSERT INTO experiencias_rutas (rut_id, exp_nombre, exp_descripcion)
+VALUES
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 'Noche con amigos', 'Plan para convivir, comer y terminar en un ambiente de fiesta.'),
+
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 'Noche de cócteles', 'Experiencia para cenar y disfrutar bebidas en lugares con ambiente especial.'),
+
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 'Karaoke y despecho', 'Ruta pensada para cantar, convivir y pasar una noche divertida.'),
+
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 'Cena y ambiente tranquilo', 'Plan nocturno más relajado, ideal para cenar y platicar.');
+
+
+INSERT INTO experiencias_rutas (rut_id, exp_nombre, exp_descripcion)
+VALUES
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 'Día al aire libre', 'Naturaleza, paseo y actividades para disfrutar en familia.'),
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 'Diversión extrema', 'Juegos, trampolines y videojuegos para todas las edades.'),
+((SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 'Tarde infantil', 'Espacio ideal para niños con juegos y cafetería.');
+SELECT exp_id, exp_nombre
+FROM experiencias_rutas
+WHERE rut_id = (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night')
+ORDER BY exp_id;
+DELETE FROM experiencias_rutas
+WHERE exp_id IN (10,11,12,13);
+
+
+
+SELECT exp_id, exp_nombre
+FROM experiencias_rutas
+WHERE rut_id = (
+  SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'
+)
+ORDER BY exp_id;
+INSERT INTO experiencias_lugares (exp_id, lug_id, momento, orden_en_experiencia)
+VALUES
+(1, (SELECT lug_id FROM lugares WHERE lug_nombre ILIKE 'Apapacho'), 'Desayuno', 1),
+(1, (SELECT lug_id FROM lugares WHERE lug_nombre ILIKE 'Casa Nalo'), 'Comida', 2),
+(1, (SELECT lug_id FROM lugares WHERE lug_nombre ILIKE 'The Cookie Lab'), 'Postre', 3),
+(1, (SELECT lug_id FROM lugares WHERE lug_nombre ILIKE 'Tacos el Kampeon'), 'Cena', 4);
+
+INSERT INTO experiencias_lugares (exp_id, lug_id, momento, orden_en_experiencia)
+VALUES
+(2, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Dulce’s Bakery'), 'Desayuno', 1),
+(2, (SELECT lug_id FROM lugares WHERE lug_nombre = 'ZAO'), 'Comida', 2),
+(2, (SELECT lug_id FROM lugares WHERE lug_nombre = 'The Cookie Lab'), 'Postre', 3),
+(2, (SELECT lug_id FROM lugares WHERE lug_nombre = 'El Rayo Taquería'), 'Cena', 4),
+
+(3, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Santo Café'), 'Desayuno', 1),
+(3, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Riviera'), 'Comida', 2),
+(3, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Dulce’s Bakery'), 'Postre', 3),
+(3, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Rooster Wings'), 'Cena', 4),
+
+(4, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Mercado Juárez'), 'Desayuno', 1),
+(4, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Tacos el Kampeon'), 'Comida', 2),
+(4, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Santo Café'), 'Postre / Café', 3),
+(4, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pozole Don Beto y Gorditas Chelo'), 'Cena', 4),
+
+(5, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Grazie'), 'Desayuno', 1),
+(5, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sr Kimono'), 'Comida', 2),
+(5, (SELECT lug_id FROM lugares WHERE lug_nombre = 'The Cookie Lab'), 'Postre', 3),
+(5, (SELECT lug_id FROM lugares WHERE lug_nombre = 'ZAO'), 'Cena', 4)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO experiencias_lugares (exp_id, lug_id, momento, orden_en_experiencia)
+VALUES
+-- NOCHE CON AMIGOS
+(6, (SELECT lug_id FROM lugares WHERE lug_nombre = 'La Chabela Food Park'), 'Cena / Snacks', 1),
+(6, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Punto Guerrero'), 'Drinks', 2),
+(6, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Drums'), 'Fiesta', 3),
+
+-- NOCHE DE CÓCTELES
+(7, (SELECT lug_id FROM lugares WHERE lug_nombre = 'VICENTE Asador de Brasa'), 'Cena', 1),
+(7, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Yasuko'), 'Cócteles', 2),
+(7, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Madison'), 'Ambiente nocturno', 3),
+
+-- KARAOKE Y DESPECHO
+(8, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sala de Despecho'), 'Karaoke', 1),
+(8, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Despecho'), 'Música / Fiesta', 2),
+(8, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Drums'), 'After', 3),
+
+-- CENA Y AMBIENTE TRANQUILO
+(9, (SELECT lug_id FROM lugares WHERE lug_nombre = 'VICENTE Asador de Brasa'), 'Cena', 1),
+(9, (SELECT lug_id FROM lugares WHERE lug_nombre = 'La Chabela Food Park'), 'Convivencia', 2),
+(9, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Yasuko'), 'Cócteles', 3)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO experiencias_lugares
+(exp_id, lug_id, momento, orden_en_experiencia)
+VALUES
+
+-- Día al aire libre
+(14, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Urbano'), 'Paseo', 1),
+(14, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Aviario Lira'), 'Naturaleza', 2),
+
+-- Diversión extrema
+(15, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Fly Jump'), 'Actividad', 1),
+(15, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Galex Game Center'), 'Videojuegos', 2),
+
+-- Tarde infantil
+(16, (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pikabuu'), 'Juegos y cafetería', 1)
+
+ON CONFLICT DO NOTHING;
+
+
+
+SELECT 
+  er.exp_nombre,
+  l.lug_nombre,
+  el.momento
+FROM experiencias_lugares el
+JOIN experiencias_rutas er ON el.exp_id = er.exp_id
+JOIN lugares l ON el.lug_id = l.lug_id
+WHERE er.exp_id IN (14,15,16)
+ORDER BY er.exp_id, el.orden_en_experiencia;
+SELECT 
+  er.exp_nombre,
+  l.lug_nombre,
+  el.momento,
+  el.orden_en_experiencia
+FROM experiencias_lugares el
+JOIN experiencias_rutas er ON el.exp_id = er.exp_id
+JOIN lugares l ON el.lug_id = l.lug_id
+ORDER BY er.exp_id, el.orden_en_experiencia;
 
 INSERT INTO lugares (lug_nombre, lug_descripcion, lug_latitud, lug_longitud, lug_tags)
 VALUES 
@@ -173,8 +358,129 @@ WHERE lug_nombre = 'Jardin de Cerveza (TSM)';
 UPDATE lugares SET imagen_principal_url = 'https://paseomilex.com/wp-content/uploads/2021/02/rsz_1img_3395.jpg'
 WHERE lug_nombre = 'Paseo Milex';
 
+-- ==========================================
+-- NUEVOS LUGARES GASTRONÓMICOS
+-- ==========================================
+
+INSERT INTO lugares (
+  lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags
+) VALUES
+('The Cookie Lab', 'Dulcería especializada en una variedad de postres tentadores.', 25.5525, -103.4299, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/cookie_lab_sg9fjj', 'gastronomia, postres, dulce, cafe, brunch, familiar'),
+
+('Tacos el Kampeon', 'Restaurante mexicano con el verdadero sello lagunero, amigable y familiar.', 25.5440, -103.4551, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/kampeon_mhvxde', 'gastronomia, tacos, comida mexicana, centro, familiar'),
+
+('Rooster Wings', 'Negocio lagunero de boneless, alitas y papas, bien calientitos y doraditos.', 25.5443, -103.4543, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/Rooster_k56dq4', 'gastronomia, alitas, boneless, comida casual, centro'),
+
+('ZAO', 'Cocina oriental y coctelería molecular y artesanal.', 25.5428, -103.4557, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/zao_wmqe1w', 'gastronomia, sushi, oriental, ramen, cocteleria'),
+
+('Grazie', 'Cafetería restaurante con variedad de comida y bebidas para todos los gustos.', 25.5718, -103.4109, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/grazie_hzo83b', 'gastronomia, cafeteria, brunch, bebidas, moderno'),
+
+('Casa Nalo', 'Cocina de autor con un toque que hace la diferencia.', 25.5427, -103.4562, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/casa_nalo_ybn8bz', 'gastronomia, autor, brunch, cafe, centro'),
+
+('Riviera', 'Comida de mar con sabores inolvidables.', 25.5305, -103.3959, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/riviera_pmb2hw', 'gastronomia, mariscos, comida de mar, restaurante'),
+
+('Apapacho', 'Café y brunch con café hecho con amor.', 25.5429, -103.4560, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/apap_kmbyrw', 'gastronomia, cafe, brunch, desayuno, centro'),
+
+('Sr Kimono', 'Sushi, ramen, teppanyaki y más.', 25.5689, -103.4123, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/sr_kimono_nnifk9', 'gastronomia, sushi, ramen, japones'),
+
+('Bonxi', 'Menú variado con boneless y sushi.', 25.5299, -103.3950, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/bonxi_q0nr91', 'gastronomia, boneless, sushi, comida casual');
+
+INSERT INTO lugares (
+  lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags
+) VALUES
+('Dulce’s Bakery', 'Desayunos, drinks, postres y más.', 25.54730000, -103.44790000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/bakerys_mwdzvz', 'gastronomia, desayuno, postres, bakery, cafe'),
+
+('Santo Café', 'En Santo Café el espresso no se prepara con prisa, se prepara con cariño.', 25.54090000, -103.45180000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/santoC_tyizsy', 'gastronomia, cafe, espresso, desayuno, postres'),
+
+('Pozole Don Beto y Gorditas Chelo', 'La especialidad es el pozole, jueves y viernes abiertos toda la madrugada.', 25.55800000, -103.41300000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/santoC_tyizsy', 'gastronomia, pozole, gorditas, comida mexicana, cena'),
+
+('El Rayo Taquería', 'El mejor lugar de tacos estilo Sinaloa, está en Torreón.', 25.54220000, -103.45200000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/rayo_k3atip', 'gastronomia, tacos, taqueria, comida mexicana, cena');
 
 
+INSERT INTO lugares (
+  lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags
+) VALUES
+('VICENTE Asador de Brasa', 'Restaurante de carnes, disfruta de nuestra mixología en tu mesa. Cualquier día es buen día para brindar distinto.', 25.56200000, -103.40900000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/vicente_tqjkl1', 'night, cena, carnes, mixologia, bar'),
+
+('Drums', 'Descubre Drumss en Torreón, el lugar ideal para disfrutar tus sábados en la noche. Haz tu reservación y vive la mejor fiesta.', 25.54180000, -103.44970000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/drums_cur03m', 'night, fiesta, musica, amigos, bar'),
+
+('Punto Guerrero', 'Tu punto de encuentro. Food and drinks.', 25.60600000, -103.40400000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/guerrero_sugae1', 'night, food, drinks, amigos, convivencia'),
+
+('La Chabela Food Park', 'En La Chabela Food Park encontrarás el ambiente perfecto para disfrutar de una tarde inolvidable con amigos.', 25.54170000, -103.45290000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/la_chabela_jrpnw3', 'night, food park, amigos, drinks, centro'),
+
+('Yasuko', 'Bueno para ocasiones especiales e ideal para disfrutar cócteles creativos.', 25.56500000, -103.41000000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/yasuko_gseyov', 'night, cocteles, especial, cena, bar'),
+
+('Madison', 'Bueno para ocasiones especiales e ideal para disfrutar cócteles creativos.', 25.54220000, -103.45060000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/yasuko_gseyov', 'night, cocteles, cena, especial, bar'),
+
+('Sala de Despecho', 'Karaoke, tragos y los mejores rolones para cantar tus penas en Coahuila.', 25.56250000, -103.40850000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/ChatGPT_Image_4_may_2026_01_29_44_a.m._v8tsts', 'night, karaoke, tragos, musica, amigos'),
+
+('Despecho', 'Cada noche en Despecho es una noche mágica. Ven y celebra tu cumpleaños, despedida, divorcio o simplemente tu soltería.', 25.54200000, -103.45320000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/ChatGPT_Image_4_may_2026_01_25_43_a.m._gcbgpd', 'night, musica, bar, fiesta, amigos');
+
+INSERT INTO lugares (
+  lug_nombre, lug_descripcion, lug_latitud, lug_longitud, imagen_principal_url, lug_tags
+) VALUES
+('Bosque Urbano', 'Parque familiar con atracciones, lleno de opciones para distraerse y un planetario.', 25.58000000, -103.40300000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/bosqueUrbano_eokuli', 'familiar, parque, planetario, naturaleza, niños'),
+
+('Aviario Lira', 'Aquí vivirás una experiencia única rodeado de naturaleza.', 25.47800000, -103.39400000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/Aviario_esn6cu', 'familiar, naturaleza, aves, niños, animales'),
+
+('Fly Jump', '¡Conócenos! Somos el parque más divertido de la Comarca.', 25.54000000, -103.40700000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/Fly_flxwdr', 'familiar, trampolines, juegos, niños, diversion'),
+
+('Galex Game Center', 'Ven al lugar más divertido de la galaxia. Juegos y atracciones para toda la familia.', 25.56900000, -103.49500000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/galex_tgxovk', 'familiar, arcade, videojuegos, juegos, niños'),
+
+('Pikabuu', 'Play. Connect. Repeat. Indoor playground for kids & grown-ups. Sala de juegos y cafetería.', 25.54100000, -103.40600000, 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/pikabuu_qs2jnz', 'familiar, playground, cafeteria, niños, indoor');
+
+-- ==========================================
+-- ASOCIAR NUEVOS LUGARES A RUTA GASTRONÓMICA
+-- ==========================================
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta) VALUES
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'The Cookie Lab'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 4),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Tacos el Kampeon'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 5),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Rooster Wings'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 6),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'ZAO'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 7),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Grazie'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 8),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Nalo'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 9),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Riviera'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 10),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Apapacho'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 11),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Sr Kimono'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 12),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Bonxi'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 13)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta) VALUES
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Dulce’s Bakery'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 14),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Santo Café'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 15),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Pozole Don Beto y Gorditas Chelo'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 16),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'El Rayo Taquería'), (SELECT rut_id FROM rutas WHERE rut_nombre = 'Gastronomica'), 17)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta) VALUES
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'VICENTE Asador de Brasa'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 5),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Drums'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 6),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Punto Guerrero'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 7),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'La Chabela Food Park'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 8),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Yasuko'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 9),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Madison'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 10),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Sala de Despecho'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 11),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Despecho'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Night'), 12)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lugares_rutas (lug_id, rut_id, orden_en_ruta) VALUES
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Urbano'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 5),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Aviario Lira'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 6),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Fly Jump'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 7),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Galex Game Center'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 8),
+((SELECT lug_id FROM lugares WHERE lug_nombre = 'Pikabuu'), (SELECT rut_id FROM rutas WHERE rut_nombre ILIKE 'Familiar'), 9)
+ON CONFLICT DO NOTHING;
+
+SELECT lug_id, lug_nombre
+FROM lugares
+WHERE lug_nombre IN (
+  'Bosque Urbano',
+  'Aviario Lira',
+  'Fly Jump',
+  'Galex Game Center',
+  'Pikabuu'
+);
 
 --Tablas para actividades del sprint 7
 
@@ -233,6 +539,42 @@ INSERT INTO transportes_publicos (tp_nombre, tp_tipo, tp_color, tp_descripcion) 
 ('San Agustín', 'Camión urbano', '#9CCC65', 'Ruta urbana que conecta San Agustín y el centro.'),
 ('Teleférico Torreón', 'Teleférico', '#00BCD4', 'Sistema aéreo que conecta el centro con el Cristo de las Noas.');
 
+
+-- ==========================================
+-- TRANSPORTES PARA NUEVOS LUGARES GASTRONÓMICOS
+-- ==========================================
+
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'The Cookie Lab')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Polvorera'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'The Cookie Lab')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Tacos el Kampeon')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Tacos el Kampeon')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Rooster Wings')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Rooster Wings')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'ZAO')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Jacarandas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'ZAO')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Grazie')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Grazie')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Nalo')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Jacarandas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Casa Nalo')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Valle Oriente Rojo'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Riviera')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Ciudad Nazas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Riviera')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Apapacho')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Jacarandas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Apapacho')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sr Kimono')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sr Kimono')),
+
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Valle Oriente Rojo'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bonxi')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Ciudad Nazas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bonxi'))
+ON CONFLICT DO NOTHING;
 --asociar lugares con transportes
 
 --RUTA GASTRONOMICA
@@ -425,6 +767,82 @@ INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
  (SELECT lug_id FROM lugares WHERE lug_nombre = 'Puerto Noas'))
  ON CONFLICT DO NOTHING;
 
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+-- Dulce’s Bakery
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Polvorera'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Dulce’s Bakery')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Jacarandas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Dulce’s Bakery')),
+
+-- Santo Café
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Santo Café')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Santo Café')),
+
+-- Pozole Don Beto y Gorditas Chelo
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Ciudad Nazas'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pozole Don Beto y Gorditas Chelo')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Valle Oriente Rojo'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pozole Don Beto y Gorditas Chelo')),
+
+-- El Rayo Taquería
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'El Rayo Taquería')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'El Rayo Taquería'))
+ON CONFLICT DO NOTHING;
+
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+-- VICENTE Asador de Brasa
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'VICENTE Asador de Brasa')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'VICENTE Asador de Brasa')),
+
+-- Drums
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Drums')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Drums')),
+
+-- Punto Guerrero
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Norte'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Punto Guerrero')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Punto Guerrero')),
+
+-- La Chabela Food Park
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'La Chabela Food Park')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Polvorera'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'La Chabela Food Park')),
+
+-- Yasuko
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Yasuko')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Yasuko')),
+
+-- Madison
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Madison')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Madison')),
+
+-- Sala de Despecho
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sala de Despecho')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Sala de Despecho')),
+
+-- Despecho
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Campo Alianza'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Despecho')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Despecho'))
+ON CONFLICT DO NOTHING;
+
+
+INSERT INTO transportes_lugares (tp_id, lug_id) VALUES
+-- Bosque Urbano
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Independencia-Antonio Narro'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Urbano')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Dorada'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Bosque Urbano')),
+
+-- Aviario Lira
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Sur Jardines'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Aviario Lira')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Panteones'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Aviario Lira')),
+
+-- Fly Jump
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'San Joaquín'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Fly Jump')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Fly Jump')),
+
+-- Galex Game Center
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'La Joya'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Galex Game Center')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Valle Oriente Rojo'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Galex Game Center')),
+
+-- Pikabuu
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'San Joaquín'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pikabuu')),
+((SELECT tp_id FROM transportes_publicos WHERE tp_nombre ILIKE 'Santa Fe'), (SELECT lug_id FROM lugares WHERE lug_nombre = 'Pikabuu'))
+ON CONFLICT DO NOTHING;
+
+
 SELECT * FROM transportes_lugares;
 SELECT 
   tl.tp_id,
@@ -487,3 +905,42 @@ UPDATE rutas SET rut_color = '#38b00059' WHERE rut_nombre ILIKE 'Familiar';
 ALTER TABLE rutas
 ALTER COLUMN rut_color TYPE VARCHAR(18);
 
+--verificar
+
+SELECT 
+  l.lug_nombre,
+  r.rut_nombre,
+  lr.orden_en_ruta,
+  l.imagen_principal_url
+FROM lugares_rutas lr
+JOIN lugares l ON lr.lug_id = l.lug_id
+JOIN rutas r ON lr.rut_id = r.rut_id
+WHERE r.rut_nombre = 'Gastronomica'
+ORDER BY lr.orden_en_ruta;
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/beto_w4gqcz'
+WHERE lug_nombre = 'Pozole Don Beto y Gorditas Chelo';
+SELECT 
+  l.lug_nombre,
+  t.tp_nombre
+FROM transportes_lugares tl
+JOIN lugares l ON tl.lug_id = l.lug_id
+JOIN transportes_publicos t ON tl.tp_id = t.tp_id
+WHERE l.lug_nombre IN (
+  'The Cookie Lab',
+  'Tacos el Kampeon',
+  'Rooster Wings',
+  'ZAO',
+  'Grazie',
+  'Casa Nalo',
+  'Riviera',
+  'Apapacho',
+  'Sr Kimono',
+  'Bonxi'
+)
+ORDER BY l.lug_nombre, t.tp_nombre;
+
+UPDATE lugares
+SET imagen_principal_url = 'https://res.cloudinary.com/drjcuomng/image/upload/f_auto,q_auto/madbien_vtlr5q'
+WHERE lug_nombre = 'Madison';

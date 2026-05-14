@@ -6,7 +6,7 @@ export default function RutaFamiliar() {
       categoria="Familiar"
       titulo="Experiencias Familiares"
       headerColor="#38B000"
-      cardColor="#38b00059"
+      cardColor="#38B000"
       loaderColor="#38B000"
     />
   );

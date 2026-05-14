@@ -6,7 +6,7 @@ export default function RutaNight() {
       categoria="Night"
       titulo="Experiencias De Noche"
       headerColor="#00B4D8"
-      cardColor="#00b4d834"
+      cardColor="#00B4D8"
       loaderColor="#00B4D8"
     />
   );
