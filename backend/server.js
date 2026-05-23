@@ -139,6 +139,14 @@ app.get("/lugares", async (req, res) => {
 //   console.log("Servidor en http://localhost:5000");
 // });
 
-app.listen(5000, "0.0.0.0", () => {
-  console.log("Servidor en http://0.0.0.0:5000");
+// app.listen(5000, "0.0.0.0", () => {
+//   console.log("Servidor en http://0.0.0.0:5000");
+
+  
+// });
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor en puerto ${PORT}`);
 });
