@@ -106,7 +106,7 @@ router.post(
   (req, res) => {
     try {
       const imageUrl =
-        `http://192.168.1.13:5000/uploads/${req.file.filename}`;
+        `${process.env.BASE_URL}/uploads/${req.file.filename}`;
 
       res.json({
         imageUrl,

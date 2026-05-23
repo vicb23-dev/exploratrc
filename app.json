@@ -4,11 +4,10 @@
     "slug": "exploratrc",
     "version": "1.0.0",
     "orientation": "portrait",
-
     "icon": "./assets/images/iconTRC.png",
-
     "scheme": "exploratrc",
     "userInterfaceStyle": "automatic",
+
     "newArchEnabled": true,
 
     "ios": {
@@ -35,6 +34,7 @@
 
     "plugins": [
       "expo-router",
+
       [
         "expo-splash-screen",
         {
@@ -43,12 +43,23 @@
           "resizeMode": "contain",
           "backgroundColor": "#FFFFFF"
         }
-      ]
+      ],
+
+      "expo-web-browser"
     ],
 
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    }
+      "typedRoutes": true
+    },
+
+    "extra": {
+      "router": {},
+
+      "eas": {
+        "projectId": "f40b947e-241a-411a-ad57-ab9d4c232d88"
+      }
+    },
+
+    "owner": "dannapof"
   }
 }
