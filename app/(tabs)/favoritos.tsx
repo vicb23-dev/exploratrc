@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -27,19 +28,29 @@ export default function Favoritos() {
   const [favoritos, setFavoritos] = useState<Lugar[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const usu_id = 1;
+  const [usu_id, setUsuId] = useState<number | null>(null);
+
+  const cargarUsuario = async () => {
+  const usuarioGuardado = await AsyncStorage.getItem("usuario");
+
+  if (usuarioGuardado) {
+    const usuario = JSON.parse(usuarioGuardado);
+    setUsuId(usuario.id);
+    obtenerFavoritos(usuario.id);
+  }
+};
 
   useFocusEffect(
     useCallback(() => {
-      obtenerFavoritos();
+      cargarUsuario();
     }, [])
   );
 
-  const obtenerFavoritos = async () => {
+  const obtenerFavoritos = async (idUsuario: number) => {
     try {
       setLoading(true);
 
-      const res = await API.get(`/favoritos/${usu_id}`);
+      const res = await API.get(`/favoritos/${idUsuario}`);
 
       setFavoritos(res.data);
     } catch (error) {
@@ -50,6 +61,8 @@ export default function Favoritos() {
   };
 
   const eliminarFavorito = async (lug_id: number) => {
+    if (!usu_id) return;
+    
     try {
       await API.delete(`/favoritos/${usu_id}/${lug_id}`);
 

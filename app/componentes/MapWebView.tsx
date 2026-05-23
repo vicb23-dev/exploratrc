@@ -50,8 +50,16 @@ drawORSRoute: (data: {
   }) => void;
 
   //mi ubi -> lugar
-  drawUserORSRoute: (data: {
+drawUserORSRoute: (data: {
   coordinates: [number, number][];
+}) => void;
+
+  //mi ubi -> lugar
+  drawSearchORSRoute: (data: {
+  coordinates: [number, number][];
+  placeLat: number;
+  placeLng: number;
+  placeTitle?: string;
 }) => void;
   
 };
@@ -79,99 +87,124 @@ const MapWebView = forwardRef<MapWebViewRef, Props>(
       }
     };
 
-    useImperativeHandle(ref, () => ({
-      setSingleMarker: ({ lat, lng, title }) => {
-        const data = {
-          lat,
-          lng,
-          title,
-        };
+      useImperativeHandle(ref, () => ({
+  setSingleMarker: ({ lat, lng, title }) => {
+    const data = {
+      lat,
+      lng,
+      title,
+    };
 
-        const jsCode = `
-          if (window.setSingleMarker) {
-            window.setSingleMarker(${JSON.stringify(data)});
-          }
-          true;
-        `;
+    const jsCode = `
+      if (window.setSingleMarker) {
+        window.setSingleMarker(${JSON.stringify(data)});
+      }
+      true;
+    `;
 
-        injectMapJS(jsCode);
-      },
+    injectMapJS(jsCode);
+  },
 
-      setRouteMarkers: ({
-        markers,
-        lugares,
-        activeIndex,
-        selectedIndex,
-        userLocation,
-      }) => {
-        const data = {
-          markers: markers || lugares || [],
-          activeIndex: activeIndex ?? selectedIndex ?? -1,
-          userLocation: userLocation || null,
-        };
+  setRouteMarkers: ({
+    markers,
+    lugares,
+    activeIndex,
+    selectedIndex,
+    userLocation,
+  }) => {
+    const data = {
+      markers: markers || lugares || [],
+      activeIndex: activeIndex ?? selectedIndex ?? -1,
+      userLocation: userLocation || null,
+    };
 
-        const jsCode = `
-          if (window.setRouteMarkers) {
-            window.setRouteMarkers(${JSON.stringify(data)});
-          }
-          true;
-        `;
+    const jsCode = `
+      if (window.setRouteMarkers) {
+        window.setRouteMarkers(${JSON.stringify(data)});
+      }
+      true;
+    `;
 
-        injectMapJS(jsCode);
-      },
+    injectMapJS(jsCode);
+  },
 
-      drawUserToPlace: ({
-        userLat,
-        userLng,
-        placeLat,
-        placeLng,
-        placeTitle,
-      }) => {
-        const data = {
-          userLat,
-          userLng,
-          placeLat,
-          placeLng,
-          placeTitle,
-        };
+  drawUserToPlace: ({
+    userLat,
+    userLng,
+    placeLat,
+    placeLng,
+    placeTitle,
+  }) => {
+    const data = {
+      userLat,
+      userLng,
+      placeLat,
+      placeLng,
+      placeTitle,
+    };
 
-        const jsCode = `
-          if (window.drawUserToPlace) {
-            window.drawUserToPlace(${JSON.stringify(data)});
-          }
-          true;
-        `;
+    const jsCode = `
+      if (window.drawUserToPlace) {
+        window.drawUserToPlace(${JSON.stringify(data)});
+      }
+      true;
+    `;
 
-        injectMapJS(jsCode);
-      },
-//POr calles 
-      drawORSRoute: ({ coordinates }) => {
-         const data = { coordinates };
+    injectMapJS(jsCode);
+  },
 
-        const jsCode = `
-    if (window.drawORSRoute) {
-      window.drawORSRoute(${JSON.stringify( data )});
-    }
-    true;
-  `;
+  // rutas entre lugares
+  drawORSRoute: ({ coordinates }) => {
+    const data = { coordinates };
 
-  injectMapJS(jsCode);
-},
+    const jsCode = `
+      if (window.drawORSRoute) {
+        window.drawORSRoute(${JSON.stringify(data)});
+      }
+      true;
+    `;
 
-// mi ubi -> ruta
-drawUserORSRoute: ({ coordinates }) => {
-  const data = { coordinates };
+    injectMapJS(jsCode);
+  },
 
-  const jsCode = `
-    if (window.drawUserORSRoute) {
-      window.drawUserORSRoute(${JSON.stringify(data)});
-    }
-    true;
-  `;
+  // mi ubicación -> lugar
+  drawUserORSRoute: ({ coordinates }) => {
+    const data = { coordinates };
 
-  injectMapJS(jsCode);
-},
-    }));
+    const jsCode = `
+      if (window.drawUserORSRoute) {
+        window.drawUserORSRoute(${JSON.stringify(data)});
+      }
+      true;
+    `;
+
+    injectMapJS(jsCode);
+  },
+
+  // búsqueda del mapa
+  drawSearchORSRoute: ({
+    coordinates,
+    placeLat,
+    placeLng,
+    placeTitle,
+  }) => {
+    const data = {
+      coordinates,
+      placeLat,
+      placeLng,
+      placeTitle,
+    };
+
+    const jsCode = `
+      if (window.drawSearchORSRoute) {
+        window.drawSearchORSRoute(${JSON.stringify(data)});
+      }
+      true;
+    `;
+
+    injectMapJS(jsCode);
+  },
+}));
 
     const html = `
       <!DOCTYPE html>
@@ -190,16 +223,26 @@ drawUserORSRoute: ({ coordinates }) => {
           <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
           <style>
-            html, body, #map {
-              height: 100%;
-              width: 100%;
-              margin: 0;
-              padding: 0;
-            }
-              /* BAJAR CONTROLES LEAFLET */
-                .leaflet-top {
-                  top: 20px !important;
-                }
+              html, body, #map {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+              }
+
+              /* CONTROLES ABAJO */
+              .leaflet-top {
+                top: auto !important;
+                bottom: 15px !important;
+              }
+
+              .leaflet-left {
+                left: 5px !important;
+              }
+
+              .leaflet-control-zoom {
+                margin-top: 0 !important;}
+
 
                 .leaflet-control-zoom {
                   margin-top: 20px !important;
@@ -325,7 +368,10 @@ drawUserORSRoute: ({ coordinates }) => {
             }
 
 
-            // POR CALLES
+
+
+
+             // POR CALLES
               window.drawORSRoute = function(data) {
                 if (!data || !data.coordinates || data.coordinates.length === 0) {
                   return;
@@ -395,6 +441,53 @@ drawUserORSRoute: ({ coordinates }) => {
               map.setView([data.lat, data.lng], 16);
             };
 
+
+
+
+
+
+
+
+
+
+
+window.drawSearchORSRoute = function(data) {
+  if (!data || !data.coordinates || data.coordinates.length === 0) {
+    return;
+  }
+
+  limpiarMapa();
+
+  var routeCoords = data.coordinates.map(function(coord) {
+    return [coord[1], coord[0]];
+  });
+
+  userORSRouteLine = L.polyline(routeCoords, {
+    color: "#0085d8d5",
+    weight: 5,
+    opacity: 0.95,
+    dashArray: "10, 10"
+  }).addTo(map);
+
+  userMarker = L.marker(routeCoords[0], {
+    icon: blueIcon
+  }).addTo(map).bindPopup("Mi ubicación actual");
+
+  placeMarker = L.marker([data.placeLat, data.placeLng], {
+    icon: blueIcon
+  }).addTo(map).bindPopup(data.placeTitle || "Destino");
+
+  var group = L.featureGroup([
+    userMarker,
+    placeMarker,
+    userORSRouteLine
+  ]);
+
+  map.fitBounds(group.getBounds(), {
+    padding: [45, 45]
+  });
+};
+           
             
 
             window.drawUserToPlace = function(data) {

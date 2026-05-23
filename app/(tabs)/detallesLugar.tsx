@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -72,11 +73,13 @@ const { id, exp_id, nombre } = params;
   const [loading, setLoading] = useState(true);
   const [transportes, setTransportes] = useState<Transporte[]>([]);
   const [esFavorito, setEsFavorito] = useState(false);
+  const [usuario, setUsuario] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   
 
   useEffect(() => {
+    cargarUsuario();
     obtenerUbicacionUsuario();
 
     if (idTexto) {
@@ -88,6 +91,14 @@ const { id, exp_id, nombre } = params;
   useEffect(() => {
     if (lugar) verificarFavorito();
   }, [lugar]);
+
+    const cargarUsuario = async () => {
+      const usuarioGuardado = await AsyncStorage.getItem("usuario");
+
+      if (usuarioGuardado) {
+        setUsuario(JSON.parse(usuarioGuardado));
+      }
+    };
 
   const obtenerUbicacionUsuario = async () => {
     try {
@@ -129,7 +140,8 @@ const { id, exp_id, nombre } = params;
     try {
       if (!lugar) return;
 
-      const res = await API.get("/favoritos/1");
+      
+      const res = await API.get(`/favoritos/${usuario.id}`);
       const existe = res.data.some((fav: any) => fav.lug_id === lugar.lug_id);
 
       setEsFavorito(existe);
@@ -143,12 +155,12 @@ const { id, exp_id, nombre } = params;
       if (!lugar) return;
 
       if (esFavorito) {
-        await API.delete(`/favoritos/1/${lugar.lug_id}`);
+        await API.delete(`/favoritos/${usuario.id}/${lugar.lug_id}`);
         setEsFavorito(false);
         alert("Lugar eliminado de favoritos");
       } else {
         await API.post("/favoritos", {
-          usu_id: 1,
+          usu_id: usuario.id,
           lug_id: lugar.lug_id,
         });
         setEsFavorito(true);

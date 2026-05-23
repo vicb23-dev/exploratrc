@@ -6,7 +6,7 @@ export default function RutaEntretenimiento() {
       categoria="Entretenimiento"
       titulo="Experiencias De Entretenimiento"
       headerColor="#FFC300"
-      cardColor="#ffc4003c"
+      cardColor="#FFC300"
       loaderColor="#FFC300"
     />
   );

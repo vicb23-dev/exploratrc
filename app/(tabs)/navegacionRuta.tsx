@@ -76,6 +76,30 @@ const exp_id = exp_idParam && exp_idParam.trim() !== "" ? exp_idParam : null;
 
   
 
+  function haversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) {
+  const R = 6371;
+
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+  
+
   
 
   useEffect(() => {
@@ -239,6 +263,11 @@ const obtenerRutaEntreLugaresORS = async () => {
   try {
     if (lugares.length < 2) return;
 
+    const coordsDirectos: [number, number][] = lugares.map((lugar) => [
+      Number(lugar.lug_longitud),
+      Number(lugar.lug_latitud),
+    ]);
+
     const res = await fetch(
       "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
       {
@@ -248,16 +277,25 @@ const obtenerRutaEntreLugaresORS = async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          coordinates: lugares.map((lugar) => [
-            Number(lugar.lug_longitud),
-            Number(lugar.lug_latitud),
-          ]),
+          coordinates: coordsDirectos,
         }),
       }
     );
 
     const data = await res.json();
-    const coordinates = data.features?.[0]?.geometry?.coordinates || [];
+
+    if (!data.features || data.features.length === 0) {
+      console.log("ORS falló, usando línea directa");
+
+      mapRef.current?.drawORSRoute({
+        coordinates: coordsDirectos,
+      });
+
+      return;
+    }
+
+    const coordinates: [number, number][] =
+      data.features[0].geometry.coordinates || [];
 
     console.log("RUTA ENTRE LUGARES:", coordinates.length);
 
@@ -265,7 +303,16 @@ const obtenerRutaEntreLugaresORS = async () => {
       coordinates,
     });
   } catch (error) {
-    console.log("Error ruta entre lugares:", error);
+    console.log("Error ruta entre lugares, usando línea directa:", error);
+
+    const coordsDirectos: [number, number][] = lugares.map((lugar) => [
+      Number(lugar.lug_longitud),
+      Number(lugar.lug_latitud),
+    ]);
+
+    mapRef.current?.drawORSRoute({
+      coordinates: coordsDirectos,
+    });
   }
 };
 
@@ -275,6 +322,14 @@ const obtenerRutaUsuarioAlLugarORS = async () => {
 
     const lugarActual = lugares[indiceActual];
 
+    const coordsDirectos: [number, number][] = [
+      [miUbicacion.lng, miUbicacion.lat],
+      [
+        Number(lugarActual.lug_longitud),
+        Number(lugarActual.lug_latitud),
+      ],
+    ];
+
     const res = await fetch(
       "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
       {
@@ -284,30 +339,49 @@ const obtenerRutaUsuarioAlLugarORS = async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          coordinates: [
-            [miUbicacion.lng, miUbicacion.lat],
-            [
-              Number(lugarActual.lug_longitud),
-              Number(lugarActual.lug_latitud),
-            ],
-          ],
+          coordinates: coordsDirectos,
         }),
       }
     );
 
     const data = await res.json();
-    const coordinates = data.features?.[0]?.geometry?.coordinates || [];
+
+    if (!data.features || data.features.length === 0) {
+      console.log("ORS usuario-lugar falló, usando línea directa");
+
+      mapRef.current?.drawUserORSRoute({
+        coordinates: coordsDirectos,
+      });
+
+      return;
+    }
+
+    const coordinates: [number, number][] =
+      data.features[0].geometry.coordinates || [];
 
     mapRef.current?.drawUserORSRoute({
       coordinates,
     });
   } catch (error) {
-    console.log("Error ruta usuario-lugar:", error);
+    console.log("Error ruta usuario-lugar, usando línea directa:", error);
+
+    if (!miUbicacion || lugares.length === 0) return;
+
+    const lugarActual = lugares[indiceActual];
+
+    const coordsDirectos: [number, number][] = [
+      [miUbicacion.lng, miUbicacion.lat],
+      [
+        Number(lugarActual.lug_longitud),
+        Number(lugarActual.lug_latitud),
+      ],
+    ];
+
+    mapRef.current?.drawUserORSRoute({
+      coordinates: coordsDirectos,
+    });
   }
 };
-
-
-
 
 
 

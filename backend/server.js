@@ -51,6 +51,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 // rutas existentes
 app.use("/api", userRoutes);
@@ -134,6 +135,10 @@ app.get("/lugares", async (req, res) => {
 });
 
 // SOLO UN listen
-app.listen(5000, () => {
-  console.log("Servidor en http://localhost:5000");
+// app.listen(5000, () => {
+//   console.log("Servidor en http://localhost:5000");
+// });
+
+app.listen(5000, "0.0.0.0", () => {
+  console.log("Servidor en http://0.0.0.0:5000");
 });

@@ -11,6 +11,7 @@
  * - Muestra mensajes de error si las credenciales son incorrectas
  */
 
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -29,6 +30,7 @@ export default function Login() {
   //estados para almacenar los datos del formulario
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   // manejo de iu
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -54,8 +56,10 @@ export default function Login() {
       const res = await API.post("/login", { email, password });
       // token recibido
       const token = res.data.token;
+      const usuario = res.data.usuario;
       // token local
       await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("usuario", JSON.stringify(usuario));
       //redirigir al map
       router.replace("/(tabs)/mapa");
       //  /map
@@ -91,14 +95,32 @@ export default function Login() {
         onChangeText={setEmail}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        placeholderTextColor="#ccc"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Contraseña"
+            placeholderTextColor="#999"
+            secureTextEntry={!mostrarPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity
+            onPress={() =>
+              setMostrarPassword(!mostrarPassword)
+            }
+          >
+            <Ionicons
+              name={
+                mostrarPassword
+                  ? "eye-off-outline"
+                  : "eye-outline"
+              }
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        </View>
 
       <TouchableOpacity
         style={styles.button}
@@ -186,4 +208,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "bold",
   },
+
+  passwordContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  borderRadius: 8,
+  borderWidth: 2,
+  borderColor: "#000",
+  paddingHorizontal: 12,
+  marginBottom: 15,
+
+  shadowColor: "#000",
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+
+  elevation: 3,
+},
+
+passwordInput: {
+  flex: 1,
+  height: 52,
+  fontSize: 16,
+  color: "#000",
+},
 });
