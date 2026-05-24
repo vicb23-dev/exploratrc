@@ -7,34 +7,27 @@
     "icon": "./assets/images/iconTRC.png",
     "scheme": "exploratrc",
     "userInterfaceStyle": "automatic",
-
     "newArchEnabled": true,
-
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.atheliasoft.exploratrc"
     },
-
     "android": {
       "package": "com.atheliasoft.exploratrc",
-
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/iconTRC.png",
         "backgroundColor": "#FFFFFF"
       },
-
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "pan"
     },
-
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-
     "plugins": [
       "expo-router",
-
       [
         "expo-splash-screen",
         {
@@ -44,22 +37,17 @@
           "backgroundColor": "#FFFFFF"
         }
       ],
-
       "expo-web-browser"
     ],
-
     "experiments": {
       "typedRoutes": true
     },
-
     "extra": {
       "router": {},
-
       "eas": {
         "projectId": "f40b947e-241a-411a-ad57-ab9d4c232d88"
       }
     },
-
     "owner": "dannapof"
   }
 }
