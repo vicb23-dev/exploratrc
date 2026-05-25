@@ -176,10 +176,16 @@ export default function MapScreen() {
   //chatbot
 
     //Sesion 
-    const handleLogout = () => {
-     router.replace("/login" as any);
-    };
+    const handleLogout = async () => {
+      try {
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("usuario");
 
+        router.replace("/login" as any);
+      } catch (error) {
+        console.log(error);
+      }
+    };
   const handleChatbot = () => {
     router.push("/(tabs)/chatbot" as any);
   };
